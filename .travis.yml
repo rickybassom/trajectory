@@ -11,4 +11,4 @@ install:
   - docker build -t trajectory .
 
 script:
-  - docker run -p 80:80 trajectory
+  - docker run -d -p 80:80 trajectory
