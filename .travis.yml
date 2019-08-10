@@ -1,0 +1,14 @@
+sudo: required
+
+services:
+  - docker
+
+branches:
+  only:
+    - master
+
+install:
+  - docker build -t trajectory .
+
+script:
+  - docker run -p 80:80 trajectory
