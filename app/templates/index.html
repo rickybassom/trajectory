@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Trajectory</title>
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap-grid.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
+	<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+	<header>
+      <!-- Fixed navbar -->
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="./">Trajectory</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+		<div class="collapse navbar-collapse" id="navbarCollapse">
+          	<ul class="navbar-nav mr-auto">
+				<li class="nav-item active">
+					<a class="nav-link" href="#home">Home</a>
+				</li>
+{#				<li class="nav-item">#}
+{#					<a class="nav-link" href="#form">Simple Form</a>#}
+{#				</li>#}
+{#				<li class="nav-item">#}
+{#					<a class="nav-link" href="#platepar">Upload Platepar</a>#}
+{#				</li>#}
+{#				<li class="nav-item">#}
+{#					<a class="nav-link" href="#csv">Upload CSV</a>#}
+{#				</li>#}
+			</ul>
+			<ul class="navbar-nav pull-right">
+				<li class="nav-item">
+					<a class="nav-link" href="https://globalmeteornetwork.org/">Go to GMN</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="https://github.com/rickybas/trajectory">Get Source Code</a>
+				</li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+	<div class="container">
+
+        <form class="box" method="post" action="" enctype="multipart/form-data">
+          <fieldset class="col-lg-6">
+					<legend>File upload</legend>
+
+					<div class="form-group custom-file">
+						<label for="csv_file" class="custom-file-label">File</label>
+						<input type='file' name='csv_file' id="csv_file" class="custom-file-input">
+					</div>
+				</fieldset>
+
+				<div class="form-group col-lg-12">
+					<input type="hidden" name="input_type" value="csv"/>
+					<input type='submit' name='submit' value='Send' class="btn btn-success">
+				</div>
+        </form>
+
+		<hr class="clearfix"/>
+
+		<div class="row">
+			<div class="col-lg-12">
+				<h4>Notes:</h4>
+
+				<ul>
+					<li>...</li>
+					<li>...</li>
+					<li>...</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-lg-12">
+				<h3>Source code</h3>
+
+				.............
+			</div>
+		</div>
+	</div>
+
+    <footer class="footer">
+      <div class="container text-center">
+        <span class="text-muted">Trajectory - 2019</span>
+      </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+</body>
+</html>
