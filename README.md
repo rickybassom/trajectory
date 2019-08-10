@@ -1,4 +1,6 @@
 # trajectory
+[![Build Status](https://travis-ci.com/rickybas/trajectory.svg?token=1Qmp7ACzet4TDsEVzALn&branch=master)](https://travis-ci.com/rickybas/trajectory)
+
 https://globalmeteornetwork.org/trajectory/
 
 `git submodule update --init --recursive`

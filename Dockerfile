@@ -10,7 +10,7 @@ RUN apk --update --no-cache --update-cache \
 
 RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
 
-ENV PYTHONPATH "${PYTHONPATH}:/usr/lib/python3.7/site-packages
+ENV PYTHONPATH "${PYTHONPATH}:/usr/lib/python3.7/site-packages"
 
 # Add to cache
 ADD app/requirements.txt /app/requirements.txt
