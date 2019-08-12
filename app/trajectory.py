@@ -5,7 +5,7 @@ from flask import render_template, send_from_directory
 app = Flask(__name__, static_folder='')
 
 @app.route('/trajectory/<path:path>')
-def send_js(path):
+def send_static(path):
     return send_from_directory('static', path)
 
 @app.route('/trajectory/')

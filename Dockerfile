@@ -1,12 +1,11 @@
-FROM python:3.7-alpine
+FROM python:3.7
 
 MAINTAINER Ricky Bassom
 
-RUN apk --update --no-cache --update-cache \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-        --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-        add gcc gfortran python3-dev libffi-dev openssl-dev build-base wget freetype-dev libpng-dev openblas-dev py3-qt5 geos-dev geos \
-            py3-scipy py3-pandas cython py3-matplotlib
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends \
+    gcc gfortran python3-dev libffi-dev libssl-dev build-essential wget libfreetype6-dev libpng-dev libopenblas-dev libgeos-dev \
+    python-qt4 python3-numpy python3-scipy python3-pandas cython python3-matplotlib python3-statsmodels python3-ephem libgl1-mesa-glx
 
 RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
 

@@ -1,5 +1,8 @@
+scipy
+matplotlib
 statsmodels
 flask
 jplephem
-pyephem
+ephem
 pyopenssl
+pyqt5
