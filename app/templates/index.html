@@ -1,104 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>Trajectory</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Meteor Trajectory Solver - Web Interface</title>
 
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap-grid.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
-	<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
 
 </head>
 <body>
-	<header>
-      <!-- Fixed navbar -->
-      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+<header>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
         <a class="navbar-brand" href="./">Trajectory</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
 
-		<div class="collapse navbar-collapse" id="navbarCollapse">
-          	<ul class="navbar-nav mr-auto">
-				<li class="nav-item active">
-					<a class="nav-link" href="#home">Home</a>
-				</li>
-{#				<li class="nav-item">#}
-{#					<a class="nav-link" href="#form">Simple Form</a>#}
-{#				</li>#}
-{#				<li class="nav-item">#}
-{#					<a class="nav-link" href="#platepar">Upload Platepar</a>#}
-{#				</li>#}
-{#				<li class="nav-item">#}
-{#					<a class="nav-link" href="#csv">Upload CSV</a>#}
-{#				</li>#}
-			</ul>
-			<ul class="navbar-nav pull-right">
-				<li class="nav-item">
-					<a class="nav-link" href="https://globalmeteornetwork.org/">Go to GMN</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="https://github.com/rickybas/trajectory">Get Source Code</a>
-				</li>
-          </ul>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#home">Home</a>
+                </li>
+                {#				<li class="nav-item">#}
+                {#					<a class="nav-link" href="#form">Simple Form</a>#}
+                {#				</li>#}
+                {#				<li class="nav-item">#}
+                {#					<a class="nav-link" href="#platepar">Upload Platepar</a>#}
+                {#				</li>#}
+                {#				<li class="nav-item">#}
+                {#					<a class="nav-link" href="#csv">Upload CSV</a>#}
+                {#				</li>#}
+            </ul>
+            <ul class="navbar-nav pull-right">
+                <li class="nav-item">
+                    <a class="nav-link" href="https://globalmeteornetwork.org/">Go to GMN</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://github.com/rickybas/trajectory">Get Source Code</a>
+                </li>
+            </ul>
         </div>
-      </nav>
-    </header>
+    </nav>
+</header>
 
-	<div class="container">
+<div class="container">
 
-        <form class="box" method="post" action="" enctype="multipart/form-data">
-          <fieldset class="col-lg-6">
-					<legend>File upload</legend>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="jumbotron">
+                <h2>Upload trajectory files</h2>
+                <small>Supported formats: </small>
 
-					<div class="form-group custom-file">
-						<label for="csv_file" class="custom-file-label">File</label>
-						<input type='file' name='csv_file' id="csv_file" class="custom-file-input">
-					</div>
-				</fieldset>
+                <div id="format-type">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="formatRadios" id="formatCheckboxMILIG" value="MILIG" checked>
+                        <label class="form-check-label" for="formatCheckboxMILIG">MILIG</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="formatRadios" id="formatCheckboxCAMS" value="CAMS">
+                        <label class="form-check-label" for="formatCheckboxCAMS">CAMS</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="formatRadios" id="formatCheckboxJSON" value="JSON">
+                        <label class="form-check-label" for="formatCheckboxJSON">JSON</label>
+                    </div>
+                </div>
 
-				<div class="form-group col-lg-12">
-					<input type="hidden" name="input_type" value="csv"/>
-					<input type='submit' name='submit' value='Send' class="btn btn-success">
-				</div>
-        </form>
+                <form class="box" method="post" action="/" enctype="multipart/form-data">
+                    <div class="input-group">
 
-		<hr class="clearfix"/>
+                        <div class="custom-file">
+                            <input type="file" multiple class="custom-file-input" id="inputGroupFile01"
+                                   aria-describedby="inputGroupFileAddon01">
+                            <label class="custom-file-label" for="inputGroupFile01">Choose files</label>
+                        </div>
+                    </div>
+                    <br>
+                    <input type="button" value="Upload" class="btn btn-primary">
+                </form>
+            </div>
+        </div>
 
-		<div class="row">
-			<div class="col-lg-12">
-				<h4>Notes:</h4>
+    </div>
 
-				<ul>
-					<li>...</li>
-					<li>...</li>
-					<li>...</li>
-				</ul>
-			</div>
-		</div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div id="output">
 
-		<div class="row">
-			<div class="col-lg-12">
-				<h3>Source code</h3>
+            </div>
+        </div>
 
-				.............
-			</div>
-		</div>
-	</div>
+    </div>
 
-    <footer class="footer">
-      <div class="container text-center">
+    <hr class="clearfix"/>
+
+    <div class="row">
+
+        <div class="col-lg-12">
+            <h4>Notes:</h4>
+
+            <ul>
+                <li>...</li>
+                <li>...</li>
+                <li>...</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h3>Source code</h3>
+
+            .............
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container text-center">
         <span class="text-muted">Trajectory - 2019</span>
-      </div>
-    </footer>
+    </div>
+</footer>
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
 
+<script src="main.js"></script>
 </body>
 </html>
