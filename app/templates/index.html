@@ -1,22 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Meteor Trajectory Solver - Web Interface</title>
+{% extends "bootstrap/base.html" %}
 
+{% block html_attribs %} lang="en"{% endblock %}
+{% block title %}Meteor Trajectory Solver - Web Interface{% endblock %}
+
+{% block styles %}
+    {{ super() }}
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap-grid.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="style.css">
+          href="{{ url_for('static', filename='/trajectory/style.css') }}">
+{% endblock %}
 
-</head>
-<body>
-<header>
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='/trajectory/main.js') }}"></script>
+{% endblock %}
+
+{% block navbar %}
     <!-- Fixed navbar -->
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-        <a class="navbar-brand" href="./">Trajectory</a>
+        <a class="navbar-brand" href="./">Meteor Trajectory Solver - Web Interface</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -25,17 +26,14 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#home">Home</a>
+                    <a class="nav-link" href="#upload">Upload</a>
                 </li>
-                {#				<li class="nav-item">#}
-                {#					<a class="nav-link" href="#form">Simple Form</a>#}
-                {#				</li>#}
-                {#				<li class="nav-item">#}
-                {#					<a class="nav-link" href="#platepar">Upload Platepar</a>#}
-                {#				</li>#}
-                {#				<li class="nav-item">#}
-                {#					<a class="nav-link" href="#csv">Upload CSV</a>#}
-                {#				</li>#}
+                <li class="nav-item active">
+                    <a class="nav-link" href="#output">Output</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="#notes">Notes</a>
+                </li>
             </ul>
             <ul class="navbar-nav pull-right">
                 <li class="nav-item">
@@ -47,127 +45,134 @@
             </ul>
         </div>
     </nav>
-</header>
+{% endblock %}
 
-<div class="container">
+{% block content %}
+    <div class="container">
 
-    <div class="row">
-        <div class="col-12">
-            <div class="jumbotron">
-                <h2>Upload trajectory files</h2>
-                <small>Supported formats:</small>
+        <div class="row" id="upload">
+            <div class="col-12">
+                <div class="jumbotron">
 
-                <div id="format-type">
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="formatRadios" id="formatCheckboxMILIG"
-                               value="MILIG" checked>
-                        <label class="form-check-label" for="formatCheckboxMILIG">MILIG</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="formatRadios" id="formatCheckboxCAMS"
-                               value="CAMS">
-                        <label class="form-check-label" for="formatCheckboxCAMS">CAMS</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="formatRadios" id="formatCheckboxJSON"
-                               value="JSON">
-                        <label class="form-check-label" for="formatCheckboxJSON">JSON</label>
-                    </div>
+                    <form method="post" action="{{ url_for('trajectory') }}" enctype="multipart/form-data" class="box">
+                        {{ form.csrf_token }}
+                        <h2>Upload trajectory files</h2>
+                        <small>Supported formats:</small>
+
+                        <div class="form-group" id="format-type">
+                            {% for radio in form.format %}
+                                <label class="radio-inline">
+                                    {{ radio }}
+                                    {{ radio.label.text }}
+                                </label>
+                            {% endfor %}
+                        </div>
+
+                        <div class="input-group">
+                            <div class="custom-file">
+                                {{ form.files(class_="custom-file-input") }}
+                                <label class="custom-file-label" for="inputGroupFile01">Choose files</label>
+                            </div>
+                        </div>
+
+                        <ul>
+                            {% for error in form.files.errors %}
+                                <li style="color:red;">{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+
+                        <br>
+
+                        <a data-toggle="collapse" href="#options" role="button" aria-expanded="false"
+                           aria-controls="options"><p>More options ⯆</p></a>
+
+                        <div class="collapse" id="options">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label for="max-toffset" class="col-3 col-form-label">max_toffset</label>
+                                    <div class="col-3">{{ form.max_toffset(class_="form-control") }}</div>
+                                </div>
+
+                                <div class="row">
+                                    <ul>
+                                        {% for error in form.max_toffset.errors %}
+                                            <li style="color:red;">{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="max-toffset" class="col-3 col-form-label">max_toffset</label>
+                                    <div class="col-3">{{ form.v_init_part(class_="form-control") }}</div>
+                                </div>
+
+                                <div class="row">
+                                    <ul>
+                                        {% for error in form.v_init_part.errors %}
+                                            <li style="color:red;">{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="max-toffset" class="col-3 col-form-label">max_toffset</label>
+                                    <div class="col-3">{{ form.v_init_ht(class_="form-control") }}</div>
+                                </div>
+
+                                <div class="row">
+                                    <ul>
+                                        {% for error in form.v_init_ht.errors %}
+                                            <li style="color:red;">{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <br>
+                        <input type="submit" value="Upload" class="btn btn-primary">
+                    </form>
                 </div>
+            </div>
 
-                <form class="box" method="post" action="/" enctype="multipart/form-data">
-                    <div class="input-group">
-                        <div class="custom-file">
-                            <input type="file" multiple class="custom-file-input" id="inputGroupFile01"
-                                   aria-describedby="inputGroupFileAddon01">
-                            <label class="custom-file-label" for="inputGroupFile01">Choose files</label>
-                        </div>
-                    </div>
+        </div>
 
-                    <br>
+        <div class="row" id="output">
+            <div class="col-lg-12">
+                <h2>Output </h2>
 
-                    <a data-toggle="collapse" href="#options" role="button" aria-expanded="false"
-                       aria-controls="options"><p>More options ⯆</p></a>
+            </div>
 
-                    <div class="collapse" id="options">
-                        <div class="card-body">
-                            <div class="form-group row">
-                                <label for="max-toffset" class="col-3 col-form-label">max_toffset</label>
-                                <div class="col-3">
-                                    <input class="form-control" type="number" value="5" placeholder="0" id="max-toffset">
-                                </div>
-                            </div>
+        </div>
 
-                            <div class="form-group row">
-                                <label for="v-init-part" class="col-3 col-form-label">v_init_part</label>
-                                <div class="col-3">
-                                    <input class="form-control" type="number" step="0.01" value="0.25" placeholder="0" id="v-init-part">
-                                </div>
-                            </div>
+        <hr class="clearfix"/>
 
-                            <div class="form-group row">
-                                <label for="v-init-ht" class="col-3 col-form-label">v_init_ht</label>
-                                <div class="col-3">
-                                    <input class="form-control" type="number" value="" placeholder="None" id="v-init-ht">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="row" id="notes">
 
+            <div class="col-lg-12">
+                <h4>Notes:</h4>
 
-                    <br>
-                    <input type="button" value="Upload" class="btn btn-primary">
-                </form>
+                <ul>
+                    <li>...</li>
+                    <li>...</li>
+                    <li>...</li>
+                </ul>
             </div>
         </div>
 
-    </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <h3>Source code</h3>
 
-    <div class="row">
-        <div class="col-lg-12">
-            <div id="output">
-
+                .............
             </div>
         </div>
-
     </div>
 
-    <hr class="clearfix"/>
-
-    <div class="row">
-
-        <div class="col-lg-12">
-            <h4>Notes:</h4>
-
-            <ul>
-                <li>...</li>
-                <li>...</li>
-                <li>...</li>
-            </ul>
+    <footer class="footer">
+        <div class="container text-center">
+            <span class="text-muted">Trajectory - 2019</span>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-12">
-            <h3>Source code</h3>
-
-            .............
-        </div>
-    </div>
-</div>
-
-<footer class="footer">
-    <div class="container text-center">
-        <span class="text-muted">Trajectory - 2019</span>
-    </div>
-</footer>
-
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
-
-<script src="main.js"></script>
-</body>
-</html>
+    </footer>
+{% endblock %}
