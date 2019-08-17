@@ -3,6 +3,10 @@
 
 https://globalmeteornetwork.org/trajectory/
 
+Using [WesternMeteorPyLib](https://github.com/wmpg/WesternMeteorPyLib)
+
+## Building and running
+
 `git submodule update --init --recursive`
 
 `sudo docker build -t trajectory .`
