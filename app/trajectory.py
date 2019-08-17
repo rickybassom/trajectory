@@ -4,10 +4,8 @@ from flask import Flask
 from flask import render_template, send_from_directory
 from flask_bootstrap import Bootstrap
 
-from flask_wtf import FlaskForm
-from wtforms import RadioField, MultipleFileField, DecimalField
-from wtforms.validators import InputRequired
-from wtforms.widgets import html5
+from upload_form import UploadForm
+from wmpg_trajectory_solver import WMPGTrajectorySolver
 
 app = Flask(__name__, static_folder='/trajectory/')
 Bootstrap(app)
@@ -26,13 +24,14 @@ def trajectory():
     form = UploadForm()
 
     if form.validate_on_submit():
-        return "the form has been submitted " + form.format.data
+        solver = WMPGTrajectorySolver()
+        return solver.solve(form)
 
     return render_template('index.html', form=form)
 
 
 @app.route('/trajectory/test')
-def hello():
+def test():
     import datetime
     import math
 
@@ -47,16 +46,3 @@ def hello():
     lasun = sollon.jd2SolLonJPL(jd_now)
 
     return str(math.degrees(lasun)), ' deg'
-
-
-class UploadForm(FlaskForm):
-    format = RadioField('Supported formats:', choices=[('MILIG', 'MILIG'), ('CAMS', 'CAMS'), ('JSON', 'JSON')],
-                        default='MILIG', validators=[InputRequired()])
-    files = MultipleFileField('File(s) upload', validators=[InputRequired()])
-
-    # options
-    max_toffset = DecimalField('max_toffset', places=2, default=5.00, widget=html5.NumberInput())
-    v_init_part = DecimalField('v_init_part', places=2, default=0.25, widget=html5.NumberInput())
-    v_init_ht = DecimalField('v_init_ht', places=2, default=None)
-
-    # TODO: recaptcha???
