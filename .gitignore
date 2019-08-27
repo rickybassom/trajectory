@@ -4,3 +4,5 @@ foobar.key
 trajectrory.ini
 trajectory.sock
 *.pyc
+app/static/temp_data//*
+!app/static/temp_data//.gitkeep

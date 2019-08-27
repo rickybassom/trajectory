@@ -1,0 +1,19 @@
+body {
+    padding-top: 100px;
+}
+
+a {
+    text-decoration: none !important
+}
+.custom-file-input {
+    height: auto !important;
+    cursor: pointer !important;
+}
+
+input[type="file"] {
+    text-indent: -999px;
+}
+
+#format-type {
+    margin-bottom: 25px;
+}

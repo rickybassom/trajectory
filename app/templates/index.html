@@ -5,13 +5,13 @@
 
 {% block styles %}
     {{ super() }}
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='/trajectory/style.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', filename='styles/style.css') }}">
 {% endblock %}
 
 {% block scripts %}
     {{ super() }}
-    <script src="{{ url_for('static', filename='/trajectory/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/main.js') }}"></script>
 {% endblock %}
 
 {% block navbar %}
@@ -26,10 +26,7 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#upload">Upload</a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="#output">Output</a>
+                    <a class="nav-link" href="#input">Input</a>
                 </li>
                 <li class="nav-item active">
                     <a class="nav-link" href="#notes">Notes</a>
@@ -50,101 +47,160 @@
 {% block content %}
     <div class="container">
 
-        <div class="row" id="upload">
+        <div class="row" id="input">
             <div class="col-12">
                 <div class="jumbotron">
 
-                    <form method="post" action="{{ url_for('trajectory') }}" enctype="multipart/form-data" class="box">
-                        {{ form.csrf_token }}
-                        <h2>Upload trajectory files</h2>
-                        <small>Supported formats:</small>
+                    <h2>Input trajectory files</h2>
+                    <small>Supported formats:</small>
 
-                        <div class="form-group" id="format-type">
-                            {% for radio in form.format %}
-                                <label class="radio-inline">
-                                    {{ radio }}
-                                    {{ radio.label.text }}
-                                </label>
-                            {% endfor %}
+                    <ul class="nav nav-pills" id="formats" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="milig-tab" data-toggle="tab" href="#milig" role="tab"
+                               aria-controls="milig" aria-selected="true">MILIG</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="cams-tab" data-toggle="tab" href="#cams" role="tab"
+                               aria-controls="cams" aria-selected="false">CAMS</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="rmsjson-tab" data-toggle="tab" href="#rmsjson" role="tab"
+                               aria-controls="rmsjson" aria-selected="false">RMSJSON</a>
+                        </li>
+                    </ul>
+
+                    <br>
+
+                    <div class="tab-content" id="formats-tabContent">
+                        <div class="tab-pane fade show active" id="milig" role="tabpanel"
+                             aria-labelledby="milig-tab">
+
+                            <form method="post" action="{{ url_for('trajectory_api', format="MILIG") }}"
+                                  enctype="multipart/form-data"
+                                  class="box">
+                                {{ milig_form.csrf_token }}
+
+                                <h4>
+                                    Files
+                                </h4>
+
+                                {% for upload_method in milig_form.upload_methods %}
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            {{ upload_method(class_="custom-file-input") }}
+                                            <label class="custom-file-label"
+                                                   for="file">{{ upload_method.label }}</label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+
+                                <ul>
+                                    {% for error in milig_form.upload_methods.errors %}
+                                        <li style="color:red;">{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+
+                                <br>
+
+                                {% with form=milig_form, format="milig" %}
+                                    {% include 'options.html' %}
+                                {% endwith %}
+
+                                <br>
+                                <input type="submit" value="Get output" class="btn btn-primary">
+                            </form>
+
                         </div>
 
-                        <div class="input-group">
-                            <div class="custom-file">
-                                {{ form.files(class_="custom-file-input") }}
-                                <label class="custom-file-label" for="inputGroupFile01">Choose files</label>
-                            </div>
+                        <div class="tab-pane fade" id="cams" role="tabpanel" aria-labelledby="cams-tab">
+                            <form method="post" action="{{ url_for('trajectory_api', format="CAMS") }}"
+                                  enctype="multipart/form-data"
+                                  class="box">
+                                {{ cams_form.csrf_token }}
+
+                                <h4>
+                                    Files
+                                </h4>
+
+
+                                {% for upload_method in cams_form.upload_methods %}
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            {{ upload_method(class_="custom-file-input", id_= "choose-file") }}
+                                            <label class="custom-file-label"
+                                                   for="file">{{ upload_method.label }}</label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+
+                                <ul>
+                                    {% for error in cams_form.upload_methods.errors %}
+                                        <li style="color:red;">{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+
+                                <br>
+
+                                {% with form=cams_form, format="cams" %}
+                                    {% include 'options.html' %}
+                                {% endwith %}
+
+                                <br>
+                                <input type="submit" value="Get output" class="btn btn-primary">
+                            </form>
                         </div>
 
-                        <ul>
-                            {% for error in form.files.errors %}
-                                <li style="color:red;">{{ error }}</li>
-                            {% endfor %}
-                        </ul>
+                        <div class="tab-pane fade" id="rmsjson" role="tabpanel" aria-labelledby="rmsjson-tab">
+                            <form method="post" action="{{ url_for('trajectory_api', format="RMSJSON") }}"
+                                  enctype="multipart/form-data"
+                                  class="box">
+                                {{ rmsjson_form.csrf_token }}
 
-                        <br>
+                                <h4>
+                                    Files
+                                </h4>
 
-                        <a data-toggle="collapse" href="#options" role="button" aria-expanded="false"
-                           aria-controls="options"><p>More options ⯆</p></a>
+                                {% for upload_method in rmsjson_form.upload_methods %}
+                                    <div class="input-group">
+                                        <div class="custom-file">
+                                            {{ upload_method(class_="custom-file-input", id_= "choose-file") }}
+                                            <label class="custom-file-label"
+                                                   for="file">{{ upload_method.label }}</label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
 
-                        <div class="collapse" id="options">
-                            <div class="card-body">
-                                <div class="form-group row">
-                                    <label for="max-toffset" class="col-3 col-form-label">max_toffset</label>
-                                    <div class="col-3">{{ form.max_toffset(class_="form-control") }}</div>
-                                </div>
+                                <ul>
+                                    {% for error in rmsjson_form.upload_methods.errors %}
+                                        <li style="color:red;">{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
 
-                                <div class="row">
-                                    <ul>
-                                        {% for error in form.max_toffset.errors %}
-                                            <li style="color:red;">{{ error }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
+                                <br>
 
-                                <div class="form-group row">
-                                    <label for="max-toffset" class="col-3 col-form-label">max_toffset</label>
-                                    <div class="col-3">{{ form.v_init_part(class_="form-control") }}</div>
-                                </div>
+                                {% with form=rmsjson_form, format="rmsjson" %}
+                                    {% include 'options.html' %}
+                                {% endwith %}
 
-                                <div class="row">
-                                    <ul>
-                                        {% for error in form.v_init_part.errors %}
-                                            <li style="color:red;">{{ error }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label for="max-toffset" class="col-3 col-form-label">max_toffset</label>
-                                    <div class="col-3">{{ form.v_init_ht(class_="form-control") }}</div>
-                                </div>
-
-                                <div class="row">
-                                    <ul>
-                                        {% for error in form.v_init_ht.errors %}
-                                            <li style="color:red;">{{ error }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-
-                            </div>
+                                <br>
+                                <input type="submit" value="Get output" class="btn btn-primary">
+                            </form>
                         </div>
+                    </div>
 
-                        <br>
-                        <input type="submit" value="Upload" class="btn btn-primary">
-                    </form>
                 </div>
-            </div>
 
+            </div>
         </div>
 
-{#        <div class="row" id="output">#}
-{#            <div class="col-lg-12">#}
-{#                <h2>Output </h2>#}
-{##}
-{#            </div>#}
-{##}
-{#        </div>#}
+
+        {#        <div class="row" id="output">#}
+        {#            <div class="col-lg-12">#}
+        {#                <h2>Output </h2>#}
+        {##}
+        {#            </div>#}
+        {##}
+        {#        </div>#}
 
         <hr class="clearfix"/>
 

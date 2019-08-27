@@ -1,48 +1,52 @@
 import os
 
 from flask import Flask
-from flask import render_template, send_from_directory
+from flask import render_template, abort, jsonify
 from flask_bootstrap import Bootstrap
 
-from upload_form import UploadForm
-from wmpg_trajectory_solver import WMPGTrajectorySolver
 
-app = Flask(__name__, static_folder='/trajectory/')
+from upload_forms import MILIGUploadForm
+from upload_forms import CAMSUploadForm
+from upload_forms import RMSJSONUploadForm
+from wmpg_trajectory_form_solver import WMPGTrajectoryFormSolver
+
+app = Flask(__name__)
 Bootstrap(app)
+
+app.config['TEMP_DIR'] = os.path.join(app.root_path, 'static', 'temp_data')
 
 SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
 
-
-@app.route('/trajectory/<path:path>')
-def send_static(path):
-    return send_from_directory('static', path)
-
-
 @app.route('/trajectory/', methods=['GET', 'POST'])
 def trajectory():
-    form = UploadForm()
+    milig_form = MILIGUploadForm()
+    cams_form = CAMSUploadForm()
+    rmsjson_form = RMSJSONUploadForm()
 
-    if form.validate_on_submit():
-        solver = WMPGTrajectorySolver()
-        return solver.solve(form)
+    return render_template('index.html', milig_form=milig_form, cams_form=cams_form, rmsjson_form=rmsjson_form)
 
-    return render_template('index.html', form=form)
+@app.route('/trajectory/api/<format>', methods=['POST'])
+def trajectory_api(format):
+    if format == "MILIG":
+        form = MILIGUploadForm()
+        if form.validate_on_submit():
+            solver = WMPGTrajectoryFormSolver(app.config.get('TEMP_DIR'))
+            return solver.solveForZip(form, format)
 
+        return jsonify(data=form.errors)
 
-@app.route('/trajectory/test')
-def test():
-    import datetime
-    import math
+    elif format == "CAMS":
+        form = CAMSUploadForm()
+        if form.validate_on_submit():
+            solver = WMPGTrajectoryFormSolver(app.config.get('TEMP_DIR'))
+            return solver.solveForZip(form, format)
 
-    # Import modules from WMPL
-    import wmpl.Utils.TrajConversions as trajconv
-    import wmpl.Utils.SolarLongitude as sollon
+    elif format=="RMSJSON":
+        form = RMSJSONUploadForm()
+        if form.validate_on_submit():
+            solver = WMPGTrajectoryFormSolver(app.config.get('TEMP_DIR'))
+            return solver.solveForZip(form, format)
 
-    # Compute the Julian date of the current time
-    jd_now = trajconv.datetime2JD(datetime.datetime.now())
-
-    # Get the solar longitude of the current time (in radians)
-    lasun = sollon.jd2SolLonJPL(jd_now)
-
-    return str(math.degrees(lasun)), ' deg'
+    else:
+        return abort(400)
