@@ -1,5 +1,4 @@
-import time
-import uuid, os, zipfile, json
+import time, json, uuid, os, zipfile
 from io import BytesIO
 
 from flask import send_file
@@ -16,7 +15,7 @@ class WMPGTrajectoryFormSolver:
     def __init__(self, temp_dir):
         self.temp_dir = temp_dir
 
-    def solveForZip(self, form, format):
+    def solve_for_zip(self, form, format):
         """
         Return zip of output
 
@@ -45,14 +44,21 @@ class WMPGTrajectoryFormSolver:
             attachment_filename=filename
         )
 
-    def solveForJSON(self, form):
+    def solve_for_json(self, form, format, url_base):
         """
         Return JSON of
 
         :param form:
         :return:
         """
-        return self._solve(form, format)
+
+        uuid_path = self._solve(form, format)
+
+        json_files = []
+        for file in os.listdir(uuid_path):
+            json_files.append(url_base + os.path.join("/temp", os.path.basename(uuid_path), file))
+
+        return json_files
 
     def _solve(self, form, format):
         """
@@ -71,7 +77,7 @@ class WMPGTrajectoryFormSolver:
         if format == "MILIG":
             filenames = self.saved_files_from_form(form.upload_methods, dir_path)
             solveTrajectoryMILIG(dir_path, filenames['file_input'], max_toffset=max_toffset,
-                                 v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False)
+                                 v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, verbose=False)
 
         elif format == "CAMS":
             filenames = self.saved_files_from_form(form.upload_methods, dir_path)
@@ -89,7 +95,7 @@ class WMPGTrajectoryFormSolver:
                                             time_offsets=time_offsets)
 
             solveTrajectoryCAMS(meteor_list, dir_path, max_toffset=max_toffset,
-                                v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False)
+                                v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, verbose=False)
         elif format == "RMSJSON":
             filenames = self.saved_files_from_form(form.upload_methods, dir_path)
 
@@ -101,7 +107,7 @@ class WMPGTrajectoryFormSolver:
                     json_list.append(data)
 
             solveTrajectoryRMS(json_list, max_toffset=max_toffset,
-                               v_init_part=v_init_part, v_init_ht=v_init_ht)
+                               v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, verbose=False)
         else:
             assert "Format not found"
 
@@ -117,7 +123,7 @@ class WMPGTrajectoryFormSolver:
         :return:
         """
 
-        saved_file_names = dict() # type of file (e.g FTPdetectinfo) : filename
+        saved_file_names = dict()  # type of file (e.g FTPdetectinfo) : filename
         for upload_method in upload_methods:
             def validator_used_in_field(field, validator_type):
                 for validator in field.validators:

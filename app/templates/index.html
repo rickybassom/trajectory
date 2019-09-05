@@ -75,10 +75,11 @@
                         <div class="tab-pane fade show active" id="milig" role="tabpanel"
                              aria-labelledby="milig-tab">
 
-                            <form method="post" action="{{ url_for('trajectory_api', format="MILIG") }}"
+                            <form method="post"
                                   enctype="multipart/form-data"
-                                  class="box">
+                                  class="box upload-form">
                                 {{ milig_form.csrf_token }}
+                                {{ milig_form.format }}
 
                                 <h4>
                                     Files
@@ -107,16 +108,21 @@
                                 {% endwith %}
 
                                 <br>
-                                <input type="submit" value="Get output" class="btn btn-primary">
+
+                                <input type="submit" value="Show output" class="btn btn-primary"
+                                       formaction="{{ url_for('trajectory_api') }}">
+                                <input type="submit" value="Download output zip" class="btn btn-primary"
+                                       formaction="{{ url_for('trajectory') }}">
                             </form>
 
                         </div>
 
                         <div class="tab-pane fade" id="cams" role="tabpanel" aria-labelledby="cams-tab">
-                            <form method="post" action="{{ url_for('trajectory_api', format="CAMS") }}"
+                            <form method="post"
                                   enctype="multipart/form-data"
-                                  class="box">
+                                  class="box upload-form">
                                 {{ cams_form.csrf_token }}
+                                {{ cams_form.format }}
 
                                 <h4>
                                     Files
@@ -146,15 +152,20 @@
                                 {% endwith %}
 
                                 <br>
-                                <input type="submit" value="Get output" class="btn btn-primary">
+
+                                <input type="submit" value="Show output" class="btn btn-primary"
+                                       formaction="{{ url_for('trajectory_api') }}">
+                                <input type="submit" value="Download output zip" class="btn btn-primary"
+                                       formaction="{{ url_for('trajectory') }}">
                             </form>
                         </div>
 
                         <div class="tab-pane fade" id="rmsjson" role="tabpanel" aria-labelledby="rmsjson-tab">
-                            <form method="post" action="{{ url_for('trajectory_api', format="RMSJSON") }}"
+                            <form method="post"
                                   enctype="multipart/form-data"
-                                  class="box">
+                                  class="box upload-form">
                                 {{ rmsjson_form.csrf_token }}
+                                {{ rmsjson_form.format }}
 
                                 <h4>
                                     Files
@@ -183,7 +194,10 @@
                                 {% endwith %}
 
                                 <br>
-                                <input type="submit" value="Get output" class="btn btn-primary">
+                                <input type="submit" value="Show output" class="btn btn-primary"
+                                       formaction="{{ url_for('trajectory_api') }}">
+                                <input type="submit" value="Download output zip" class="btn btn-primary"
+                                       formaction="{{ url_for('trajectory') }}">
                             </form>
                         </div>
                     </div>

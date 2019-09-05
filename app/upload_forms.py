@@ -1,10 +1,12 @@
 from flask_wtf import FlaskForm
-from wtforms import FileField, DecimalField, MultipleFileField
+from wtforms import FileField, DecimalField, MultipleFileField, HiddenField
+from wtforms.validators import InputRequired
 from flask_wtf.file import FileRequired, FileAllowed
 from wtforms.widgets import html5
 
 
 class UploadForm(FlaskForm):
+    format = HiddenField("Format", validators=[InputRequired()])
     upload_methods = []
 
     # options
@@ -21,9 +23,8 @@ class MILIGUploadForm(UploadForm):
 
     def __init__(self):
         UploadForm.__init__(self)
-        self.upload_methods = [
-            self.file_input
-        ]
+        self.format.process_data("MILIG")
+        self.upload_methods = [self.file_input]
 
 
 class CAMSUploadForm(UploadForm):
@@ -33,6 +34,7 @@ class CAMSUploadForm(UploadForm):
 
     def __init__(self):
         UploadForm.__init__(self)
+        self.format.process_data("CAMS")
         self.upload_methods = [self.file_FTP_detect_info, self.file_camera_sites, self.file_camera_time_offsets]
 
 
@@ -41,4 +43,5 @@ class RMSJSONUploadForm(UploadForm):
 
     def __init__(self):
         UploadForm.__init__(self)
+        self.format.process_data("RMSJSON")
         self.upload_methods = [self.files_json]
