@@ -1,11 +1,14 @@
 from flask_wtf import FlaskForm
-from wtforms import FileField, DecimalField, MultipleFileField, HiddenField
-from wtforms.validators import InputRequired
+from wtforms import FileField, DecimalField, MultipleFileField, HiddenField, RadioField
+from wtforms.validators import InputRequired, ValidationError
 from flask_wtf.file import FileRequired, FileAllowed
 from wtforms.widgets import html5
 
+import trajectory
+
 
 class UploadForm(FlaskForm):
+    output_type = RadioField('Output Type', choices=[('json', 'Show output'), ('zip', 'Download zip')], default="json")
     format = HiddenField("Format", validators=[InputRequired()])
     upload_methods = []
 
@@ -15,7 +18,10 @@ class UploadForm(FlaskForm):
     v_init_ht = DecimalField('v_init_ht', places=2, default=-1, widget=html5.NumberInput())
 
     # TODO: recaptcha?
-    # TODO: JSON option
+
+    def validate_format(form, field):
+        if field.data not in trajectory.app.config.get('FORMS'):
+            raise ValidationError('format must be either "MILIG", "CAMS" or "RMSJSON" ')
 
 
 class MILIGUploadForm(UploadForm):
@@ -39,7 +45,7 @@ class CAMSUploadForm(UploadForm):
 
 
 class RMSJSONUploadForm(UploadForm):
-    files_json = MultipleFileField('Json files')
+    files_json = MultipleFileField('Json files', validators=[InputRequired(), FileAllowed(['json'], 'input files must be .json')])
 
     def __init__(self):
         UploadForm.__init__(self)

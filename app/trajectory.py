@@ -19,79 +19,25 @@ app.config['TEMP_DIR'] = os.path.join(app.root_path, 'static', 'temp_data')
 SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
 
-
 api.add_resource(RestfulUploadForm, '/trajectory/api')
 
 
-@app.route('/trajectory/', methods=['GET', 'POST'])
+@app.before_first_request
+def init():
+    app.config['FORMS'] = {
+        "MILIG": MILIGUploadForm,
+        "CAMS": CAMSUploadForm,
+        "RMSJSON": RMSJSONUploadForm
+    }
+
+
+@app.route('/trajectory/', methods=['GET'])
 def trajectory():
-    if request.method == 'POST':
-        format = request.values['format']
-
-        if format == "MILIG":
-            form = MILIGUploadForm()
-            if form.validate_on_submit():
-                solver = WMPGTrajectoryFormSolver(app.config.get('TEMP_DIR'))
-                return solver.solve_for_zip(form, format)
-
-            return jsonify(data=form.errors)
-
-        elif format == "CAMS":
-            form = CAMSUploadForm()
-            if form.validate_on_submit():
-                solver = WMPGTrajectoryFormSolver(app.config.get('TEMP_DIR'))
-                return solver.solve_for_zip(form, format)
-
-            return jsonify(data=form.errors)
-
-        elif format == "RMSJSON":
-            form = RMSJSONUploadForm()
-            if form.validate_on_submit():
-                solver = WMPGTrajectoryFormSolver(app.config.get('TEMP_DIR'))
-                return solver.solve_for_zip(form, format)
-
-            return jsonify(data=form.errors)
-
-        else:
-            return abort(400)
-
     milig_form = MILIGUploadForm()
     cams_form = CAMSUploadForm()
     rmsjson_form = RMSJSONUploadForm()
 
     return render_template('index.html', milig_form=milig_form, cams_form=cams_form, rmsjson_form=rmsjson_form)
-
-#
-# @app.route('/trajectory/api', methods=['POST'])
-# def trajectory_api():
-#     request_url = request.url
-#     format = request.values['format']
-#     if format == "MILIG":
-#         form = MILIGUploadForm()
-#         if form.validate_on_submit():
-#             solver = WMPGTrajectoryFormSolver(app.config.get('TEMP_DIR'))
-#             return jsonify(solver.solve_for_json(form, format, request_url[:request_url.rfind('/')]))
-#
-#         return jsonify(data=form.errors)
-#
-#     elif format == "CAMS":
-#         form = CAMSUploadForm()
-#         if form.validate_on_submit():
-#             solver = WMPGTrajectoryFormSolver(app.config.get('TEMP_DIR'))
-#             return jsonify(solver.solve_for_json(form, format, request_url[:request_url.rfind('/')]))
-#
-#         return jsonify(data=form.errors)
-#
-#     elif format == "RMSJSON":
-#         form = RMSJSONUploadForm()
-#         if form.validate_on_submit():
-#             solver = WMPGTrajectoryFormSolver(app.config.get('TEMP_DIR'))
-#             return jsonify(solver.solve_for_json(form, format, request_url[:request_url.rfind('/')]))
-#
-#         return jsonify(data=form.errors)
-#
-#     else:
-#         return abort(400)
 
 
 @app.route('/trajectory/temp/<uuid>/<filename>', methods=['GET'])

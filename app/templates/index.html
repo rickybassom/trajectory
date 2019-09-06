@@ -12,8 +12,8 @@
 {% block scripts %}
     {{ super() }}
     <script>
-    var CSRFToken = "{{ milig_form.csrf_token._value() }}"; // all forms have the same csrf_token
-    console.log(CSRFToken);
+        var CSRFToken = "{{ milig_form.csrf_token._value() }}"; // all forms have the same csrf_token
+        console.log(CSRFToken);
     </script>
     <script src="{{ url_for('static', filename='scripts/main.js') }}"></script>
 {% endblock %}
@@ -79,7 +79,7 @@
                         <div class="tab-pane fade show active" id="milig" role="tabpanel"
                              aria-labelledby="milig-tab">
 
-                            <form method="post"
+                            <form method="post" action="/trajectory/api"
                                   enctype="multipart/form-data"
                                   class="box upload-form">
                                 {{ milig_form.csrf_token }}
@@ -113,16 +113,15 @@
 
                                 <br>
 
-                                <input type="submit" value="Show output" class="btn btn-primary"
-                                       formaction="/trajectory/api">
-                                <input type="submit" value="Download output zip" class="btn btn-primary"
-                                       formaction="{{ url_for('trajectory') }}">
+                                {{ milig_form.output_type }}
+
+                                <input type="submit" value="Process" class="btn btn-primary show-output-btn">
                             </form>
 
                         </div>
 
                         <div class="tab-pane fade" id="cams" role="tabpanel" aria-labelledby="cams-tab">
-                            <form method="post"
+                            <form method="post" action="/trajectory/api"
                                   enctype="multipart/form-data"
                                   class="box upload-form">
                                 {{ cams_form.csrf_token }}
@@ -157,15 +156,14 @@
 
                                 <br>
 
-                                <input type="submit" value="Show output" class="btn btn-primary"
-                                       formaction="/trajectory/api">
-                                <input type="submit" value="Download output zip" class="btn btn-primary"
-                                       formaction="{{ url_for('trajectory') }}">
+                                {{ cams_form.output_type }}
+
+                                <input type="submit" value="Show output" class="btn btn-primary show-output-btn">
                             </form>
                         </div>
 
                         <div class="tab-pane fade" id="rmsjson" role="tabpanel" aria-labelledby="rmsjson-tab">
-                            <form method="post"
+                            <form method="post" action="/trajectory/api"
                                   enctype="multipart/form-data"
                                   class="box upload-form">
                                 {{ rmsjson_form.csrf_token }}
@@ -198,10 +196,11 @@
                                 {% endwith %}
 
                                 <br>
-                                <input type="submit" value="Show output" class="btn btn-primary"
-                                       formaction="/trajectory/api/">
-                                <input type="submit" value="Download output zip" class="btn btn-primary"
-                                       formaction="{{ url_for('trajectory') }}">
+
+                                {{ rmsjson_form.output_type }}
+
+                                <input type="submit" value="Show output" class="btn btn-primary show-output-btn">
+
                             </form>
                         </div>
                     </div>
@@ -212,13 +211,17 @@
         </div>
 
 
-        {#        <div class="row" id="output">#}
-        {#            <div class="col-lg-12">#}
-        {#                <h2>Output </h2>#}
-        {##}
-        {#            </div>#}
-        {##}
-        {#        </div>#}
+        <div class="row" id="output">
+            <div class="col-lg-12">
+                <h2>Output</h2>
+
+                <div id="output-result">
+
+                </div>
+
+            </div>
+
+        </div>
 
         <hr class="clearfix"/>
 

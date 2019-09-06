@@ -1,11 +1,71 @@
+var outputResultDiv = $('#output-result')[0];
+var forms = $('.upload-form');
+
 $(document).ready(function () {
-    var forms = $('.upload-form');
     forms.each(function () {
         $(this).submit(function (event) {
-            onFormSubmit(event, this);
+            console.log(this);
+            onFormJSONSubmit(event, this);
         });
     });
+
 });
+
+function onFormJSONSubmit(event, form) {
+    if (form.querySelector('input[name="output_type"]:checked').value === "json") {
+        // Stop the browser from submitting the form.
+        event.preventDefault();
+
+        console.log('submit clicked');
+
+        var formData = new FormData(form);
+
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                outputResultDiv.innerHTML = "Loading......";
+
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", CSRFToken)
+                }
+            }
+        });
+
+        $.ajax({
+            //more changes here
+            // data: data,
+            url: "/trajectory/api",
+            type: "POST",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                outputResultDiv.innerHTML = "";
+                setServerReturnedOutput(response);
+            },
+            error: function (error) {
+                outputResultDiv.innerHTML = "";
+                setServerReturnedError(error)
+            }
+        });
+    }
+
+}
+
+function setServerReturnedOutput(json_data) {
+    console.log(json_data);
+
+    for (i in json_data) {
+        var p = document.createElement("p");
+        p.innerText = json_data[i];
+        outputResultDiv.appendChild(p);
+    }
+}
+
+function setServerReturnedError(error) {
+    setServerReturnedOutput(error);
+}
+
 
 $('.custom-file-input').on('change', function () {
     var files = [];
@@ -31,46 +91,3 @@ $.fn.serializeObject = function () {
     });
     return o;
 };
-
-function onFormSubmit(event, form) {
-    // Stop the browser from submitting the form.
-    event.preventDefault();
-
-    console.log('submit clicked');
-
-    var formData = new FormData(form);
-    console.log(formData);
-
-    $.ajaxSetup({
-        beforeSend: function (xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", CSRFToken)
-            }
-        }
-    });
-
-    $.ajax({
-        //more changes here
-        // data: data,
-        url: "/trajectory/api",
-        type: "POST",
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false,
-        success: function (response) {
-            console.log(response);
-        },
-        error: function (error) {
-            console.log(error);
-        }
-    });
-
-}
-
-function setServerReturnedError() {
-}
-
-function resetInputFiles() {
-    // TODO
-}
