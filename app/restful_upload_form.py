@@ -25,4 +25,6 @@ class RestfulUploadForm(Resource):
                 else: # form.output_type.data == "zip"
                     return solver.solve_for_zip(form, format)
 
-        return jsonify(data=form.errors), 400
+        response = jsonify(data=form.errors)
+        response.status_code = 400
+        return response

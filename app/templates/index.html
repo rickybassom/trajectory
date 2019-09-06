@@ -19,7 +19,6 @@
 {% endblock %}
 
 {% block navbar %}
-    <!-- Fixed navbar -->
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
         <a class="navbar-brand" href="./">Meteor Trajectory Solver - Web Interface</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
@@ -47,6 +46,7 @@
         </div>
     </nav>
 {% endblock %}
+
 
 {% block content %}
     <div class="container">
@@ -99,12 +99,6 @@
                                     </div>
                                 {% endfor %}
 
-                                <ul>
-                                    {% for error in milig_form.upload_methods.errors %}
-                                        <li style="color:red;">{{ error }}</li>
-                                    {% endfor %}
-                                </ul>
-
                                 <br>
 
                                 {% with form=milig_form, format="milig" %}
@@ -131,7 +125,6 @@
                                     Files
                                 </h4>
 
-
                                 {% for upload_method in cams_form.upload_methods %}
                                     <div class="input-group">
                                         <div class="custom-file">
@@ -141,12 +134,6 @@
                                         </div>
                                     </div>
                                 {% endfor %}
-
-                                <ul>
-                                    {% for error in cams_form.upload_methods.errors %}
-                                        <li style="color:red;">{{ error }}</li>
-                                    {% endfor %}
-                                </ul>
 
                                 <br>
 
@@ -183,12 +170,6 @@
                                     </div>
                                 {% endfor %}
 
-                                <ul>
-                                    {% for error in rmsjson_form.upload_methods.errors %}
-                                        <li style="color:red;">{{ error }}</li>
-                                    {% endfor %}
-                                </ul>
-
                                 <br>
 
                                 {% with form=rmsjson_form, format="rmsjson" %}
@@ -209,7 +190,6 @@
 
             </div>
         </div>
-
 
         <div class="row" id="output">
             <div class="col-lg-12">
