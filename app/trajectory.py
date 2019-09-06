@@ -6,7 +6,6 @@ from flask_bootstrap import Bootstrap
 from flask_restful import Api
 
 from upload_forms import MILIGUploadForm, CAMSUploadForm, RMSJSONUploadForm
-
 from restful_upload_form import RestfulUploadForm
 
 app = Flask(__name__)
