@@ -35,7 +35,7 @@ def trajectory():
     cams_form = CAMSUploadForm()
     rmsjson_form = RMSJSONUploadForm()
 
-    return render_template('index.html', milig_form=milig_form, cams_form=cams_form, rmsjson_form=rmsjson_form)
+    return render_template('index.html', forms={"milig": milig_form, "cams" : cams_form, "rmsjson" : rmsjson_form})
 
 
 @app.route('/trajectory/temp/<uuid>/<filename>', methods=['GET'])

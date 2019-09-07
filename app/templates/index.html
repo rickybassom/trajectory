@@ -12,7 +12,7 @@
 {% block scripts %}
     {{ super() }}
     <script>
-        var CSRFToken = "{{ milig_form.csrf_token._value() }}"; // all forms have the same csrf_token
+        var CSRFToken = "{{ forms["milig"].csrf_token._value() }}"; // all forms have the same csrf_token
         console.log(CSRFToken);
     </script>
     <script src="{{ url_for('static', filename='scripts/main.js') }}"></script>
@@ -59,131 +59,65 @@
                     <small>Supported formats:</small>
 
                     <ul class="nav nav-pills" id="formats" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="milig-tab" data-toggle="tab" href="#milig" role="tab"
-                               aria-controls="milig" aria-selected="true">MILIG</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="cams-tab" data-toggle="tab" href="#cams" role="tab"
-                               aria-controls="cams" aria-selected="false">CAMS</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="rmsjson-tab" data-toggle="tab" href="#rmsjson" role="tab"
-                               aria-controls="rmsjson" aria-selected="false">RMSJSON</a>
-                        </li>
+                        {% for form_name, form in forms.items() %}
+                            <li class="nav-item">
+                                <a class="nav-link {% if form_name=="milig" %}
+                                active
+                            {% endif %}" id="{{ form_name }}-tab" data-toggle="tab"
+                                   href="#{{ form_name }}" role="tab"
+                                   aria-controls="{{ form_name }}" aria-selected="true">{{ form_name.upper() }}</a>
+                            </li>
+                        {% endfor %}
                     </ul>
 
                     <br>
 
                     <div class="tab-content" id="formats-tabContent">
-                        <div class="tab-pane fade show active" id="milig" role="tabpanel"
-                             aria-labelledby="milig-tab">
+                        {% for form_name, form in forms.items() %}
 
-                            <form method="post" action="/trajectory/api"
-                                  enctype="multipart/form-data"
-                                  class="box upload-form">
-                                {{ milig_form.csrf_token }}
-                                {{ milig_form.format }}
+                            <div class="tab-pane fade show {% if form_name=="milig" %}
+                                active
+                            {% endif %}" id="{{ form_name }}" role="tabpanel"
+                                 aria-labelledby="{{ form_name }}-tab">
 
-                                <h4>
-                                    Files
-                                </h4>
+                                <form method="post" action="/trajectory/api"
+                                      enctype="multipart/form-data"
+                                      class="box upload-form">
+                                    {{ form.csrf_token }}
+                                    {{ form.format }}
 
-                                {% for upload_method in milig_form.upload_methods %}
-                                    <div class="input-group">
-                                        <div class="custom-file">
-                                            {{ upload_method(class_="custom-file-input") }}
-                                            <label class="custom-file-label"
-                                                   for="file">{{ upload_method.label }}</label>
+                                    <h4>
+                                        Files
+                                    </h4>
+
+                                    {% for upload_method in form.upload_methods %}
+                                        <div class="input-group">
+                                            <div class="custom-file">
+                                                {{ upload_method(class_="custom-file-input") }}
+                                                <label class="custom-file-label"
+                                                       for="file">{{ upload_method.label }}</label>
+                                            </div>
                                         </div>
-                                    </div>
-                                {% endfor %}
+                                        <br>
+                                    {% endfor %}
 
-                                <br>
+                                    <br>
 
-                                {% with form=milig_form, format="milig" %}
-                                    {% include 'options.html' %}
-                                {% endwith %}
+                                    {% with form=form, format=form_name %}
+                                        {% include 'options.html' %}
+                                    {% endwith %}
 
-                                <br>
+                                    <br>
 
-                                {{ milig_form.output_type }}
+                                    {{ form.output_type }}
 
-                                <input type="submit" value="Process" class="btn btn-primary show-output-btn">
-                            </form>
+                                    <input type="submit" value="Process" class="btn btn-primary show-output-btn">
+                                </form>
 
-                        </div>
+                            </div>
 
-                        <div class="tab-pane fade" id="cams" role="tabpanel" aria-labelledby="cams-tab">
-                            <form method="post" action="/trajectory/api"
-                                  enctype="multipart/form-data"
-                                  class="box upload-form">
-                                {{ cams_form.csrf_token }}
-                                {{ cams_form.format }}
+                        {% endfor %}
 
-                                <h4>
-                                    Files
-                                </h4>
-
-                                {% for upload_method in cams_form.upload_methods %}
-                                    <div class="input-group">
-                                        <div class="custom-file">
-                                            {{ upload_method(class_="custom-file-input", id_= "choose-file") }}
-                                            <label class="custom-file-label"
-                                                   for="file">{{ upload_method.label }}</label>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-
-                                <br>
-
-                                {% with form=cams_form, format="cams" %}
-                                    {% include 'options.html' %}
-                                {% endwith %}
-
-                                <br>
-
-                                {{ cams_form.output_type }}
-
-                                <input type="submit" value="Show output" class="btn btn-primary show-output-btn">
-                            </form>
-                        </div>
-
-                        <div class="tab-pane fade" id="rmsjson" role="tabpanel" aria-labelledby="rmsjson-tab">
-                            <form method="post" action="/trajectory/api"
-                                  enctype="multipart/form-data"
-                                  class="box upload-form">
-                                {{ rmsjson_form.csrf_token }}
-                                {{ rmsjson_form.format }}
-
-                                <h4>
-                                    Files
-                                </h4>
-
-                                {% for upload_method in rmsjson_form.upload_methods %}
-                                    <div class="input-group">
-                                        <div class="custom-file">
-                                            {{ upload_method(class_="custom-file-input", id_= "choose-file") }}
-                                            <label class="custom-file-label"
-                                                   for="file">{{ upload_method.label }}</label>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-
-                                <br>
-
-                                {% with form=rmsjson_form, format="rmsjson" %}
-                                    {% include 'options.html' %}
-                                {% endwith %}
-
-                                <br>
-
-                                {{ rmsjson_form.output_type }}
-
-                                <input type="submit" value="Show output" class="btn btn-primary show-output-btn">
-
-                            </form>
-                        </div>
                     </div>
 
                 </div>
