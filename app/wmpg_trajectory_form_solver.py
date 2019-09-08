@@ -1,7 +1,6 @@
-import time, json, uuid, os, zipfile
+import time, json, uuid, os, zipfile, shutil
 from io import BytesIO
 
-from flask import send_file
 from werkzeug.utils import secure_filename
 from wtforms import FileField, MultipleFileField
 
@@ -15,20 +14,41 @@ class WMPGTrajectoryFormSolver:
     def __init__(self, temp_dir):
         self.temp_dir = temp_dir
 
-    def solve_for_zip(self, form, format):
+    def solve_for_json(self, form, format, url_base):
         """
-        Return zip of output
+        Return JSON of output directory including zip
+
+        :param form:
+        :return:
+        """
+
+        try:
+            uuid_path = self._solve(form, format)
+        except Exception as e:
+            raise e
+
+        json_files = []
+        for file in os.listdir(uuid_path):
+            json_files.append(url_base + os.path.join("/temp", os.path.basename(uuid_path), file))
+
+        zip_file = self._create_zip(uuid_path)
+        json_files.append(url_base + os.path.join("/temp", os.path.basename(uuid_path), zip_file))
+
+        return json_files
+
+    def _create_zip(self, output_dir):
+        """
+        Return filename of zip of output_dir
 
         :param form:
         :param format:
         :return:
         """
 
-        output_dir = self._solve(form, format)
-
         timestr = time.strftime("%Y%m%d-%H%M%S")
         filename = "output_{}.zip".format(timestr)
 
+        # create zip in memory
         memory_file = BytesIO()
         with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zipf:
             lenDirPath = len(output_dir)
@@ -38,28 +58,11 @@ class WMPGTrajectoryFormSolver:
                     zipf.write(filePath, filePath[lenDirPath:])
         memory_file.seek(0)
 
-        return send_file(
-            memory_file,
-            mimetype='application/zip',
-            as_attachment=True,
-            attachment_filename=filename
-        )
+        # save zip
+        with open(os.path.join(output_dir, filename), 'wb') as f:
+            shutil.copyfileobj(memory_file, f, length=131072)
 
-    def solve_for_json(self, form, format, url_base):
-        """
-        Return JSON of
-
-        :param form:
-        :return:
-        """
-
-        uuid_path = self._solve(form, format)
-
-        json_files = []
-        for file in os.listdir(uuid_path):
-            json_files.append(url_base + os.path.join("/temp", os.path.basename(uuid_path), file))
-
-        return json_files
+        return filename
 
     def _solve(self, form, format):
         """
@@ -78,26 +81,32 @@ class WMPGTrajectoryFormSolver:
 
         if format == "MILIG":
             filenames = self.save_files_from_form(form.upload_methods, dir_path)
-            solveTrajectoryMILIG(dir_path, filenames['file_input'], max_toffset=max_toffset,
-                                 v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, show_plots=False, verbose=False)
+            try:
+                solveTrajectoryMILIG(dir_path, filenames['file_input'], max_toffset=max_toffset,
+                                     v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, show_plots=False, verbose=False)
+            except:
+                raise Exception("Input files incorrect")
 
         elif format == "CAMS":
             filenames = self.save_files_from_form(form.upload_methods, dir_path)
 
-            # Get locations of stations
-            stations = loadCameraSites(os.path.join(dir_path, filenames["file_camera_sites"]))
+            try:
+                # Get locations of stations
+                stations = loadCameraSites(os.path.join(dir_path, filenames["file_camera_sites"]))
 
-            time_offsets = None
-            if 'file_camera_time_offsets' in filenames:
-                # Get time offsets of cameras
-                time_offsets = loadCameraTimeOffsets(os.path.join(dir_path, filenames["file_camera_time_offsets"]))
+                time_offsets = None
+                if 'file_camera_time_offsets' in filenames:
+                    # Get time offsets of cameras
+                    time_offsets = loadCameraTimeOffsets(os.path.join(dir_path, filenames["file_camera_time_offsets"]))
 
-            # Get the meteor data
-            meteor_list = loadFTPDetectInfo(os.path.join(dir_path, filenames["file_FTP_detect_info"]), stations,
-                                            time_offsets=time_offsets)
+                # Get the meteor data
+                meteor_list = loadFTPDetectInfo(os.path.join(dir_path, filenames["file_FTP_detect_info"]), stations,
+                                                time_offsets=time_offsets)
 
-            solveTrajectoryCAMS(meteor_list, dir_path, max_toffset=max_toffset,
-                                v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, show_plots=False, verbose=False)
+                solveTrajectoryCAMS(meteor_list, dir_path, max_toffset=max_toffset,
+                                    v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, show_plots=False, verbose=False)
+            except:
+                raise Exception("Input files incorrect")
 
         elif format == "RMSJSON":
             filenames = self.save_files_from_form(form.upload_methods, dir_path)
@@ -109,8 +118,11 @@ class WMPGTrajectoryFormSolver:
                     data = json.load(f)
                     json_list.append(data)
 
-            solveTrajectoryRMS(json_list, max_toffset=max_toffset,
+            try:
+                solveTrajectoryRMS(json_list, max_toffset=max_toffset,
                                v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, show_plots=False, verbose=False)
+            except:
+                raise Exception("Input files incorrect")
         else:
             assert "Format not found"
 
@@ -118,7 +130,7 @@ class WMPGTrajectoryFormSolver:
 
     def save_files_from_form(self, upload_methods, dir_path):
         """
-        Returns saved filenames
+        Returns saved filenames of files entered in the form
 
         :param files_data:
         :param extensions:
@@ -143,7 +155,6 @@ class WMPGTrajectoryFormSolver:
 
             elif type(upload_method) is FileField:
                 filename = secure_filename(upload_method.data.filename)
-                print()
                 saved_file_names[upload_method.label.field_id] = filename
                 upload_method.data.save(os.path.join(dir_path, filename))
 

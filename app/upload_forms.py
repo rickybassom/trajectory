@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import FileField, DecimalField, MultipleFileField, HiddenField, RadioField
+from wtforms import FileField, DecimalField, MultipleFileField, HiddenField
 from wtforms.validators import InputRequired, ValidationError
 from flask_wtf.file import FileRequired, FileAllowed
 from wtforms.widgets import html5
@@ -8,8 +8,7 @@ import trajectory
 
 
 class UploadForm(FlaskForm):
-    output_type = RadioField('Output Type', choices=[('json', 'Show output'), ('zip', 'Download zip')], default="json")
-    format = HiddenField("Format", validators=[InputRequired()])
+    format = HiddenField("Format", validators=[InputRequired()]) # MILIG, CAMS or RMSJSON
     upload_methods = []
 
     # options

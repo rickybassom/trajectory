@@ -4,7 +4,7 @@ statsmodels
 flask
 Flask-Bootstrap4
 Flask-WTF
-flask-restful
+flask-limiter
 jplephem
 ephem
 pyopenssl
