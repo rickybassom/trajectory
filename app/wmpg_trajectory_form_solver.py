@@ -34,7 +34,7 @@ class WMPGTrajectoryFormSolver:
         zip_file = self._create_zip(uuid_path)
         json_files.append(url_base + os.path.join("/temp", os.path.basename(uuid_path), zip_file))
 
-        return json_files
+        return uuid_path, json_files
 
     def _create_zip(self, output_dir):
         """
@@ -80,15 +80,16 @@ class WMPGTrajectoryFormSolver:
         os.mkdir(dir_path)
 
         if format == "MILIG":
-            filenames = self.save_files_from_form(form.upload_methods, dir_path)
+            filenames = self._save_files_from_form(form.upload_methods, dir_path)
             try:
                 solveTrajectoryMILIG(dir_path, filenames['file_input'], max_toffset=max_toffset,
                                      v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, show_plots=False, verbose=False)
             except:
+                self.remove_saved_files(dir_path)
                 raise Exception("Input files incorrect")
 
         elif format == "CAMS":
-            filenames = self.save_files_from_form(form.upload_methods, dir_path)
+            filenames = self._save_files_from_form(form.upload_methods, dir_path)
 
             try:
                 # Get locations of stations
@@ -106,10 +107,11 @@ class WMPGTrajectoryFormSolver:
                 solveTrajectoryCAMS(meteor_list, dir_path, max_toffset=max_toffset,
                                     v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, show_plots=False, verbose=False)
             except:
+                self.remove_saved_files(dir_path)
                 raise Exception("Input files incorrect")
 
         elif format == "RMSJSON":
-            filenames = self.save_files_from_form(form.upload_methods, dir_path)
+            filenames = self._save_files_from_form(form.upload_methods, dir_path)
 
             # Load all json files
             json_list = []
@@ -122,13 +124,14 @@ class WMPGTrajectoryFormSolver:
                 solveTrajectoryRMS(json_list, max_toffset=max_toffset,
                                v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, show_plots=False, verbose=False)
             except:
+                self.remove_saved_files(dir_path)
                 raise Exception("Input files incorrect")
         else:
             assert "Format not found"
 
         return dir_path
 
-    def save_files_from_form(self, upload_methods, dir_path):
+    def _save_files_from_form(self, upload_methods, dir_path):
         """
         Returns saved filenames of files entered in the form
 
@@ -162,3 +165,11 @@ class WMPGTrajectoryFormSolver:
                 assert "Upload method" + str(type(upload_method)) + "not available"
 
         return saved_file_names
+
+    def remove_saved_files(self, uuid_directory):
+        """
+
+        :return:
+        """
+        print("removing", uuid_directory)
+        shutil.rmtree(uuid_directory)

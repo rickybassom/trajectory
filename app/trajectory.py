@@ -1,4 +1,5 @@
-import os
+import os, time
+from threading import Thread
 
 from flask import Flask, request, jsonify
 from flask import render_template, abort, send_file
@@ -23,6 +24,8 @@ app.config['TEMP_DIR'] = os.path.join(app.root_path, 'static', 'temp_data')
 SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
 
+solver = WMPGTrajectoryFormSolver(app.config.get('TEMP_DIR'))
+
 @app.before_first_request
 def init():
     app.config['FORMS'] = {
@@ -30,7 +33,6 @@ def init():
         "CAMS": CAMSUploadForm,
         "RMSJSON": RMSJSONUploadForm
     }
-
 
 @app.route('/trajectory/', methods=['GET'])
 def trajectory():
@@ -52,18 +54,23 @@ def trajectory_api():
 
     if form.validate_on_submit():
         try:
-            solver = WMPGTrajectoryFormSolver(app.config.get('TEMP_DIR'))
+            solved_path, solved_data = solver.solve_for_json(form, format, request_url[:request_url.rfind('/')])
+
+            def remove_trajectory_files(solved_path):
+                time.sleep(60 * 10)
+                solver.remove_saved_files(solved_path)
+
+            thread = Thread(target=remove_trajectory_files, kwargs={'solved_path': solved_path})
+            thread.start()
+
+
+            return jsonify(solved_data)
         except Exception as e:
             print(e)
-            abort(400)
-        else:
-            try:
-                return jsonify(solver.solve_for_json(form, format, request_url[:request_url.rfind('/')]))
-            except Exception as e:
-                print(e)
-                response = jsonify(data=str(e))
-                response.status_code = 400
-                return response
+            response = jsonify(data=str(e))
+            response.status_code = 400
+            return response
+
 
     response = jsonify(data=form.errors)
     response.status_code = 400
