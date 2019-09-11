@@ -93,16 +93,23 @@
                                         Files
                                     </h4>
 
-                                    {% for upload_method in form.upload_methods %}
-                                        <div class="input-group">
-                                            <div class="custom-file">
-                                                {{ upload_method(class_="custom-file-input") }}
-                                                <label class="custom-file-label"
-                                                       for="file">{{ upload_method.label }}</label>
-                                            </div>
-                                        </div>
-                                        <br>
-                                    {% endfor %}
+                                    <table>
+                                        {% for upload_method in form.upload_methods %}
+                                            <tr>
+                                                <th style="width: 180px;">{{ upload_method.label }}</th>
+
+                                                <th>
+                                                    <div class="input-group">
+                                                        <div class="custom-file">
+                                                            {{ upload_method(class_="custom-file-input") }}
+                                                            <label class="custom-file-label"
+                                                                   for="file">Select files</label>
+                                                        </div>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
 
                                     <br>
 

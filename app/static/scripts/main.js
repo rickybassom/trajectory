@@ -70,11 +70,19 @@ function setServerReturnedError(error) {
 
 // add filenames chosen from file choose dialog
 $('.custom-file-input').on('change', function () {
-    var files = [];
-    for (var i = 0; i < $(this)[0].files.length; i++) {
-        files.push($(this)[0].files[i].name);
+    if($(this)[0].files.length === 0) {
+        $(this).next('.custom-file-label').html("<b>Select files</b>");
+        return;
     }
-    $(this).next('.custom-file-label').html("<b>" + files.join(', ') + "</b>");
+    if($(this)[0].files.length === 1) {
+        $(this).next('.custom-file-label').html($(this)[0].files[0].name);
+        return;
+    }
+
+    if($(this)[0].files.length > 1) {
+        $(this).next('.custom-file-label').html("<b>" + $(this)[0].files.length.toString() + " selected files</b>");
+    }
+
 });
 
 // https://stackoverflow.com/questions/32811069/how-to-submit-a-flask-wtf-form-with-ajax

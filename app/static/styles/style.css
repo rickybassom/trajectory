@@ -5,6 +5,7 @@ body {
 a {
     text-decoration: none !important
 }
+
 .custom-file-input {
     height: auto !important;
     cursor: pointer !important;
@@ -16,4 +17,12 @@ input[type="file"] {
 
 #format-type {
     margin-bottom: 25px;
+}
+
+table {
+    width: 100%;
+}
+
+th, td {
+  padding: 15px;
 }

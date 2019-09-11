@@ -85,7 +85,8 @@ class WMPGTrajectoryFormSolver:
             filenames = self._save_files_from_form(form.upload_methods, dir_path)
             try:
                 traj = solveTrajectoryMILIG(dir_path, filenames['file_input'], max_toffset=max_toffset,
-                                     v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, save_results=False, show_plots=False, verbose=False)
+                                            v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False,
+                                            save_results=False, show_plots=False, verbose=False)
                 traj.saveReport(dir_path, "report.txt")
                 savePickle(traj, dir_path, "trajectory.pickle")
             except:
@@ -109,7 +110,8 @@ class WMPGTrajectoryFormSolver:
                                                 time_offsets=time_offsets)
 
                 traj = solveTrajectoryCAMS(meteor_list, dir_path, max_toffset=max_toffset,
-                                    v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, save_results=False, show_plots=False, verbose=False)
+                                           v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False,
+                                           save_results=False, show_plots=False, verbose=False)
                 traj.saveReport(dir_path, "report.txt")
                 savePickle(traj, dir_path, "trajectory.pickle")
             except:
@@ -128,7 +130,8 @@ class WMPGTrajectoryFormSolver:
 
             try:
                 traj = solveTrajectoryRMS(json_list, dir_path, max_toffset=max_toffset,
-                               v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, show_plots=False, save_results=False, verbose=False)
+                                          v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False,
+                                          show_plots=False, save_results=False, verbose=False)
                 traj.saveReport(dir_path, "report.txt")
                 savePickle(traj, dir_path, "trajectory.pickle")
             except:
