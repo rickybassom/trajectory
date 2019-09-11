@@ -8,6 +8,8 @@ from wmpl.Formats.Milig import solveTrajectoryMILIG
 from wmpl.Formats.CAMS import solveTrajectoryCAMS, loadCameraSites, loadCameraTimeOffsets, loadFTPDetectInfo
 from wmpl.Formats.RMSJSON import solveTrajectoryRMS
 
+from wmpl.Utils.Pickling import savePickle
+
 
 class WMPGTrajectoryFormSolver:
 
@@ -82,8 +84,10 @@ class WMPGTrajectoryFormSolver:
         if format == "MILIG":
             filenames = self._save_files_from_form(form.upload_methods, dir_path)
             try:
-                solveTrajectoryMILIG(dir_path, filenames['file_input'], max_toffset=max_toffset,
-                                     v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, show_plots=False, verbose=False)
+                traj = solveTrajectoryMILIG(dir_path, filenames['file_input'], max_toffset=max_toffset,
+                                     v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, save_results=False, show_plots=False, verbose=False)
+                traj.saveReport(dir_path, "report.txt")
+                savePickle(traj, dir_path, "trajectory.pickle")
             except:
                 self.remove_saved_files(dir_path)
                 raise Exception("Input files incorrect")
@@ -104,8 +108,10 @@ class WMPGTrajectoryFormSolver:
                 meteor_list = loadFTPDetectInfo(os.path.join(dir_path, filenames["file_FTP_detect_info"]), stations,
                                                 time_offsets=time_offsets)
 
-                solveTrajectoryCAMS(meteor_list, dir_path, max_toffset=max_toffset,
-                                    v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, show_plots=False, verbose=False)
+                traj = solveTrajectoryCAMS(meteor_list, dir_path, max_toffset=max_toffset,
+                                    v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, save_results=False, show_plots=False, verbose=False)
+                traj.saveReport(dir_path, "report.txt")
+                savePickle(traj, dir_path, "trajectory.pickle")
             except:
                 self.remove_saved_files(dir_path)
                 raise Exception("Input files incorrect")
@@ -121,8 +127,10 @@ class WMPGTrajectoryFormSolver:
                     json_list.append(data)
 
             try:
-                solveTrajectoryRMS(json_list, max_toffset=max_toffset,
-                               v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, show_plots=False, verbose=False)
+                traj = solveTrajectoryRMS(json_list, dir_path, max_toffset=max_toffset,
+                               v_init_part=v_init_part, v_init_ht=v_init_ht, monte_carlo=False, show_plots=False, save_results=False, verbose=False)
+                traj.saveReport(dir_path, "report.txt")
+                savePickle(traj, dir_path, "trajectory.pickle")
             except:
                 self.remove_saved_files(dir_path)
                 raise Exception("Input files incorrect")
