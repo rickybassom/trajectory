@@ -39,7 +39,7 @@ function onFormJSONSubmit(event, form) {
             outputResultDiv.innerHTML = "";
             setServerReturnedOutput(response);
 
-            },
+        },
         error: function (error) {
             outputResultDiv.innerHTML = "";
             setServerReturnedError(error)
@@ -63,7 +63,7 @@ function setServerReturnedError(error) {
     console.log(error);
 
     var p = document.createElement("p");
-    p.innerText = "Error: " + error.responseJSON.data;
+    p.innerText = "Error: " + JSON.stringify(error.responseJSON);
     outputResultDiv.appendChild(p);
 }
 
@@ -74,7 +74,7 @@ $('.custom-file-input').on('change', function () {
     for (var i = 0; i < $(this)[0].files.length; i++) {
         files.push($(this)[0].files[i].name);
     }
-    $(this).next('.custom-file-label').html("<b>"+ files.join(', ') + "</b>");
+    $(this).next('.custom-file-label').html("<b>" + files.join(', ') + "</b>");
 });
 
 // https://stackoverflow.com/questions/32811069/how-to-submit-a-flask-wtf-form-with-ajax

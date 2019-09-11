@@ -8,7 +8,7 @@ import trajectory
 
 
 class UploadForm(FlaskForm):
-    format = HiddenField("Format", validators=[InputRequired()]) # MILIG, CAMS or RMSJSON
+    format = HiddenField("Format", validators=[InputRequired()])  # MILIG, CAMS or RMSJSON
     upload_methods = []
 
     # options
@@ -24,7 +24,8 @@ class UploadForm(FlaskForm):
 
 
 class MILIGUploadForm(UploadForm):
-    file_input = FileField("Single txt input file", validators=[FileRequired(), FileAllowed(['txt'], 'input file must be .txt file')])
+    file_input = FileField("Single txt input file",
+                           validators=[FileRequired(), FileAllowed(['txt'], 'input file must be .txt file')])
 
     def __init__(self):
         UploadForm.__init__(self)
@@ -33,9 +34,12 @@ class MILIGUploadForm(UploadForm):
 
 
 class CAMSUploadForm(UploadForm):
-    file_FTP_detect_info = FileField("FTPdetectinfo", validators=[FileRequired(), FileAllowed(['txt'], 'input file must be .txt file')])
-    file_camera_sites = FileField("CameraSites", validators=[FileRequired(), FileAllowed(['txt'], 'input file must be .txt file')])
-    file_camera_time_offsets = FileField("CameraTimeOffsets", validators=[FileAllowed(['txt'], 'input file must be .txt file')])
+    file_FTP_detect_info = FileField("FTPdetectinfo",
+                                     validators=[FileRequired(), FileAllowed(['txt'], 'input file must be .txt file')])
+    file_camera_sites = FileField("CameraSites",
+                                  validators=[FileRequired(), FileAllowed(['txt'], 'input file must be .txt file')])
+    file_camera_time_offsets = FileField("CameraTimeOffsets",
+                                         validators=[FileAllowed(['txt'], 'input file must be .txt file')])
 
     def __init__(self):
         UploadForm.__init__(self)
@@ -44,9 +48,15 @@ class CAMSUploadForm(UploadForm):
 
 
 class RMSJSONUploadForm(UploadForm):
-    files_json = MultipleFileField('Json files', validators=[InputRequired(), FileAllowed(['json'], 'input files must be .json')])
+    files_json = MultipleFileField('Json files',
+                                   validators=[InputRequired(), FileAllowed(['json'], 'input files must be .json')])
 
     def __init__(self):
         UploadForm.__init__(self)
         self.format.process_data("RMSJSON")
         self.upload_methods = [self.files_json]
+
+    def validate_files_json(self, field):
+        # Check that there are more than 2 JSON files given
+        if len(field.data) < 2:
+            raise ValidationError("At least 2 JSON files are needed for trajectory estimation!")
