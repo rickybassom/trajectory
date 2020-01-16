@@ -103,6 +103,10 @@ def trajectory_api():
 @app.route('/trajectory/temp/<uuid>/<filename>', methods=['GET'])
 def load_temp_data(uuid, filename):
     file_path = os.path.join(app.config.get('TEMP_DIR'), uuid, filename)
+
+    if not is_safe_path(app.config.get('TEMP_DIR'), str(file_path)):
+        return abort(404)
+
     try:
         return send_file(file_path, as_attachment=True)
     except:
@@ -110,17 +114,28 @@ def load_temp_data(uuid, filename):
 
 @app.route('/trajectory/temp-get-plots/<uuid>', methods=['GET'])
 def get_temp_plots(uuid):
-    path = os.path.join(app.config.get('TEMP_DIR'), uuid)
-    pickle_filename = [f for f in os.listdir(path) if f.endswith('.pickle')][0]
-    traj = loadPickle(path, pickle_filename)
+    file_path = os.path.join(app.config.get('TEMP_DIR'), uuid)
+
+    if not is_safe_path(app.config.get('TEMP_DIR'), file_path):
+        return abort(404)
+
+    pickle_filename = [f for f in os.listdir(file_path) if f.endswith('.pickle')][0]
+    traj = loadPickle(file_path, pickle_filename)
 
     frag_pickle_dict = traj.savePlots(None, None, show_plots=False, ret_figs=True)
     frag_pickle_dict_json = {}
     for key, value in frag_pickle_dict.items():
         print(key)
         fig = pickle.loads(value)
-        fig.set_figheight(8)
-        fig.set_figwidth(8)
         frag_pickle_dict_json[key] = mpld3.fig_to_dict(fig)
 
     return json.dumps(frag_pickle_dict_json, cls=NumpyEncoder)
+
+# https://security.openstack.org/guidelines/dg_using-file-paths.html
+def is_safe_path(basedir, path, follow_symlinks=True):
+  # resolves symbolic links
+  if follow_symlinks:
+    return os.path.realpath(path).startswith(basedir)
+
+  return os.path.abspath(path).startswith(basedir)
+
