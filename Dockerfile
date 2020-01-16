@@ -15,6 +15,7 @@ ENV PYTHONPATH "${PYTHONPATH}:/usr/lib/python3.7/site-packages"
 ADD app/requirements.txt /app/requirements.txt
 
 # numpy needs to be installed before other packages
+RUN pip install --upgrade pip
 RUN pip install --upgrade numpy
 RUN pip install --upgrade -r /app/requirements.txt
 RUN pip install --upgrade pyproj==1.9.6

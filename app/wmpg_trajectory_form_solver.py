@@ -1,4 +1,4 @@
-import time, json, uuid, os, zipfile, shutil
+import time, uuid, os, zipfile, shutil, json
 from io import BytesIO
 
 from werkzeug.utils import secure_filename
@@ -29,14 +29,20 @@ class WMPGTrajectoryFormSolver:
         except Exception as e:
             raise e
 
+        uuid = os.path.basename(uuid_path)
+
         json_files = []
         for file in os.listdir(uuid_path):
-            json_files.append(url_base + os.path.join("/temp", os.path.basename(uuid_path), file))
+            json_files.append(url_base + os.path.join("/temp", uuid, file))
 
         zip_file = self._create_zip(uuid_path)
-        json_files.append(url_base + os.path.join("/temp", os.path.basename(uuid_path), zip_file))
+        json_files.append(url_base + os.path.join("/temp", uuid, zip_file))
 
-        return uuid_path, json_files
+        data = {}
+        data["id"] = uuid
+        data["files"] = json_files
+
+        return uuid_path, data
 
     def _create_zip(self, output_dir):
         """

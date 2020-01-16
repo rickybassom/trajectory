@@ -1,6 +1,7 @@
 scipy
 matplotlib
 statsmodels
+mpld3
 flask
 Flask-Bootstrap4
 Flask-WTF
@@ -8,4 +9,5 @@ flask-limiter
 jplephem
 ephem
 pyopenssl
-pyqt5
+PyQt5
+cython
