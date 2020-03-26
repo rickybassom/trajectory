@@ -13,7 +13,6 @@ class NumpyEncoder(json.JSONEncoder):
                               numpy.float64)):
             return float(obj)
         elif isinstance(obj, (numpy.ndarray,)):  #### This is the fix
-            print("here")
             return obj.tolist()
         return json.JSONEncoder.default(self, obj)
 
@@ -106,7 +105,6 @@ def load_temp_data(uuid, filename):
 
     if not is_safe_path(app.config.get('TEMP_DIR'), str(file_path)):
         return abort(404)
-
     try:
         return send_file(file_path, as_attachment=True)
     except:
@@ -119,17 +117,25 @@ def get_temp_plots(uuid):
     if not is_safe_path(app.config.get('TEMP_DIR'), file_path):
         return abort(404)
 
-    pickle_filename = [f for f in os.listdir(file_path) if f.endswith('.pickle')][0]
+    pickle_filename = "trajectory.pickle"
     traj = loadPickle(file_path, pickle_filename)
 
     frag_pickle_dict = traj.savePlots(None, None, show_plots=False, ret_figs=True)
     frag_pickle_dict_json = {}
-    for key, value in frag_pickle_dict.items():
-        print(key)
+    for name, value in frag_pickle_dict.items():
         fig = pickle.loads(value)
-        frag_pickle_dict_json[key] = mpld3.fig_to_dict(fig)
 
-    return json.dumps(frag_pickle_dict_json, cls=NumpyEncoder)
+        if len(fig.axes) == 2:
+            fig.axes[1].patch.set_alpha(0.0)  # necessary for mpld3 to work with twinx()
+            mpld3.plugins.clear(fig) # disable zooming, moving ... due to double axis mpld3 problem
+
+        frag_pickle_dict_json[name] = mpld3.fig_to_dict(fig)
+
+
+    x = json.dumps(frag_pickle_dict_json, cls=NumpyEncoder)
+    x = x.replace(', "visible": false', "") # fixes https://github.com/mpld3/mpld3/issues/370
+    x = x.replace(', "visible": true', "")
+    return x
 
 # https://security.openstack.org/guidelines/dg_using-file-paths.html
 def is_safe_path(basedir, path, follow_symlinks=True):

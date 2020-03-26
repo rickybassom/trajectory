@@ -168,15 +168,21 @@ class WMPGTrajectoryFormSolver:
             if type(upload_method) is MultipleFileField:
                 count = 0
                 for file in upload_method.data:
-                    filename = secure_filename(file.filename)
-                    saved_file_names[upload_method.label.field_id + str(count)] = filename
-                    file.save(os.path.join(dir_path, filename))
-                    count += 1
+                    if file.filename.endswith(".txt") or file.filename.endswith(".json"):
+                        filename = secure_filename(file.filename)
+                        saved_file_names[upload_method.label.field_id + str(count)] = filename
+                        file.save(os.path.join(dir_path, filename))
+                        count += 1
+                    else:
+                        assert "File added with illegal extension"
 
             elif type(upload_method) is FileField:
-                filename = secure_filename(upload_method.data.filename)
-                saved_file_names[upload_method.label.field_id] = filename
-                upload_method.data.save(os.path.join(dir_path, filename))
+                if upload_method.data.filename.endswith(".txt") or upload_method.data.filename.endswith(".json"):
+                    filename = secure_filename(upload_method.data.filename)
+                    saved_file_names[upload_method.label.field_id] = filename
+                    upload_method.data.save(os.path.join(dir_path, filename))
+                else:
+                    assert "File added with illegal extension"
 
             else:
                 assert "Upload method" + str(type(upload_method)) + "not available"

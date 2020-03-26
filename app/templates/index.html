@@ -4,7 +4,9 @@
 {% block title %}Meteor Trajectory Solver - Web Interface{% endblock %}
 
 {% block styles %}
-    {{ super() }}
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type='text/css'
+          href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css"
           href="{{ url_for('static', filename='styles/style.css') }}">
 {% endblock %}
@@ -16,7 +18,7 @@
         console.log(CSRFToken);
     </script>
     <script src="{{ url_for('static', filename='scripts/d3.v3.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='scripts/mpld3.v0.2.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/mpld3.v0.3.js') }}"></script>
     <script src="{{ url_for('static', filename='scripts/main.js') }}"></script>
 {% endblock %}
 

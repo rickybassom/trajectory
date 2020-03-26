@@ -11,3 +11,5 @@ ephem
 pyopenssl
 PyQt5
 cython
+tensorflow
+keras
