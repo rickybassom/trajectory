@@ -115,11 +115,14 @@
                                     <br>
 
                                     <div class="form-group form-check text-center">
-                                        <input type="checkbox" class="form-check-input" id="generate-plots-{{ form_name }}">
-                                        <label class="form-check-label" for="generate-plots-{{ form_name }}">Generate plots</label>
+                                        <input type="checkbox" class="form-check-input"
+                                               id="generate-plots-{{ form_name }}">
+                                        <label class="form-check-label" for="generate-plots-{{ form_name }}">Generate
+                                            plots</label>
                                     </div>
 
-                                    <input id="process-btn" type="submit" value="Process" class="btn btn-success show-output-btn">
+                                    <input id="process-btn" type="submit" value="Process"
+                                           class="btn btn-success show-output-btn">
                                 </form>
 
                             </div>
@@ -161,9 +164,19 @@
                 <h4>Notes:</h4>
 
                 <ul>
-                    <li>...</li>
-                    <li>...</li>
-                    <li>...</li>
+                    <li>Select from three different formats (MILIG, CAMS and RMSJSON).</li>
+                    <li>Input the required files and adjust optional parameters if needed.</li>
+                    <li>Click "Process" to send a request to the server to generate a report
+                        and Python pickle from the files inputted.
+                    </li>
+                    <li>You can download the files by clicking on the file names that appear.
+                        The zip named output_... contains all the files shown.
+                        The files will be completely removed from the server 10 minutes after creation.
+                    </li>
+                    <li>Plotting the report can be performed in the browser by clicking "Plot trajectories" within 10
+                        minutes after the files are created. This can also be performed automatically by checking
+                        "Generate plots" at the file input screen.
+                    </li>
                 </ul>
             </div>
         </div>
@@ -171,8 +184,10 @@
         <div class="row">
             <div class="col-lg-12">
                 <h3>Source code</h3>
-
-                .............
+                Meteor Trajectory Solver was written by <a href="https://github.com/rickybas">Ricky Bassom</a> and is
+                licensed under the MIT License. The project uses
+                <a href="https://github.com/wmpg/WesternMeteorPyLib">WesternMeteorPyLib</a> which was written by
+                <a href="https://github.com/dvida">Denis Vida</a>.
             </div>
         </div>
     </div>
