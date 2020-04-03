@@ -24,5 +24,75 @@ table {
 }
 
 th, td {
-  padding: 15px;
+    padding: 8px;
+    font-weight: unset;
+}
+
+.tab-pane {
+    padding: 35px;
+}
+
+.form-control {
+    width: 110px;
+    display: inline;
+}
+
+.format-link {
+    margin: 10px;
+    background-color: #0000000d;
+}
+
+.modal-content {
+    padding: 50px;
+}
+
+.loader {
+    border: 6px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 6px solid black;
+    width: 60px;
+    height: 60px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.modal-lg {
+    margin: 100px;
+    max-width: unset;
+}
+
+.modal-dialog {
+    margin: 100px;
+    max-width: unset;
+}
+
+#load-plots-btn {
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+#process-btn {
+    width: 33%;
+    height: 50px;
+    margin: auto;
+    display: block;
 }

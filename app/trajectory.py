@@ -1,5 +1,6 @@
 import mpld3, json, numpy
 
+
 # FIX: https://github.com/mpld3/mpld3/issues/434
 class NumpyEncoder(json.JSONEncoder):
     """ Special json encoder for numpy types """
@@ -16,7 +17,9 @@ class NumpyEncoder(json.JSONEncoder):
             return obj.tolist()
         return json.JSONEncoder.default(self, obj)
 
+
 from mpld3 import _display
+
 _display.NumpyEncoder = NumpyEncoder
 
 import os, time
@@ -39,7 +42,7 @@ Bootstrap(app)
 limiter = Limiter(
     app,
     key_func=get_remote_address,
-    default_limits=["200 per day", "50 per hour"]
+    default_limits=["300 per day", "30 per hour"]
 )
 
 app.config['TEMP_DIR'] = os.path.join(app.root_path, 'static', 'temp_data')
@@ -49,6 +52,7 @@ app.config['SECRET_KEY'] = SECRET_KEY
 
 solver = WMPGTrajectoryFormSolver(app.config.get('TEMP_DIR'))
 
+
 @app.before_first_request
 def init():
     app.config['FORMS'] = {
@@ -57,13 +61,14 @@ def init():
         "RMSJSON": RMSJSONUploadForm
     }
 
+
 @app.route('/trajectory/', methods=['GET'])
 def trajectory():
     milig_form = MILIGUploadForm()
     cams_form = CAMSUploadForm()
     rmsjson_form = RMSJSONUploadForm()
 
-    return render_template('index.html', forms={"milig": milig_form, "cams" : cams_form, "rmsjson" : rmsjson_form})
+    return render_template('index.html', forms={"milig": milig_form, "cams": cams_form, "rmsjson": rmsjson_form})
 
 
 @app.route('/trajectory/api', methods=['POST'])
@@ -80,7 +85,7 @@ def trajectory_api():
             solved_path, solved_data = solver.solve_for_json(form, format, request_url[:request_url.rfind('/')])
 
             def remove_trajectory_files(solved_path):
-                time.sleep(60 * 10)
+                time.sleep(10 * 60)
                 solver.remove_saved_files(solved_path)
 
             thread = Thread(target=remove_trajectory_files, kwargs={'solved_path': solved_path})
@@ -92,7 +97,6 @@ def trajectory_api():
             response = jsonify(data=str(e))
             response.status_code = 400
             return response
-
 
     response = jsonify(data=form.errors)
     response.status_code = 400
@@ -110,15 +114,21 @@ def load_temp_data(uuid, filename):
     except:
         return abort(404)
 
+
 @app.route('/trajectory/temp-get-plots/<uuid>', methods=['GET'])
 def get_temp_plots(uuid):
+    # implement lock
     file_path = os.path.join(app.config.get('TEMP_DIR'), uuid)
 
     if not is_safe_path(app.config.get('TEMP_DIR'), file_path):
         return abort(404)
 
     pickle_filename = "trajectory.pickle"
-    traj = loadPickle(file_path, pickle_filename)
+    try:
+        traj = loadPickle(file_path, pickle_filename)
+    except:
+        return abort(404)
+    # end lock
 
     frag_pickle_dict = traj.savePlots(None, None, show_plots=False, ret_figs=True)
     frag_pickle_dict_json = {}
@@ -127,21 +137,23 @@ def get_temp_plots(uuid):
 
         if len(fig.axes) == 2:
             fig.axes[1].patch.set_alpha(0.0)  # necessary for mpld3 to work with twinx()
-            mpld3.plugins.clear(fig) # disable zooming, moving ... due to double axis mpld3 problem
+            mpld3.plugins.clear(fig)  # disable zooming, moving ... due to double axis mpld3 problem
+
+        if name == "orbit":
+            pass
 
         frag_pickle_dict_json[name] = mpld3.fig_to_dict(fig)
 
-
     x = json.dumps(frag_pickle_dict_json, cls=NumpyEncoder)
-    x = x.replace(', "visible": false', "") # fixes https://github.com/mpld3/mpld3/issues/370
+    x = x.replace(', "visible": false', "")  # fixes https://github.com/mpld3/mpld3/issues/370
     x = x.replace(', "visible": true', "")
     return x
 
+
 # https://security.openstack.org/guidelines/dg_using-file-paths.html
 def is_safe_path(basedir, path, follow_symlinks=True):
-  # resolves symbolic links
-  if follow_symlinks:
-    return os.path.realpath(path).startswith(basedir)
+    # resolves symbolic links
+    if follow_symlinks:
+        return os.path.realpath(path).startswith(basedir)
 
-  return os.path.abspath(path).startswith(basedir)
-
+    return os.path.abspath(path).startswith(basedir)

@@ -9,6 +9,8 @@
           href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css"
           href="{{ url_for('static', filename='styles/style.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+          integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
 {% endblock %}
 
 {% block scripts %}
@@ -31,17 +33,7 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#input">Input</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#notes">Notes</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#output">Output</a>
-                </li>
-            </ul>
+            <ul class="navbar-nav mr-auto"></ul>
             <ul class="navbar-nav pull-right">
                 <li class="nav-item">
                     <a class="nav-link" href="https://globalmeteornetwork.org/">Go to GMN</a>
@@ -63,21 +55,20 @@
                 <div class="jumbotron">
 
                     <h2>Input trajectory files</h2>
+                    <br>
                     <small>Supported formats:</small>
 
-                    <ul class="nav nav-pills" id="formats" role="tablist">
+                    <ul class="nav nav-pills nav-justified" id="formats" role="tablist">
                         {% for form_name, form in forms.items() %}
-                            <li class="nav-item">
+                            <li class="nav-item format-link">
                                 <a class="nav-link {% if form_name=="milig" %}
                                 active
                             {% endif %}" id="{{ form_name }}-tab" data-toggle="tab"
                                    href="#{{ form_name }}" role="tab"
-                                   aria-controls="{{ form_name }}" aria-selected="true">{{ form_name.upper() }}</a>
+                                   aria-controls="{{ form_name }}" aria-selected="true">{{ form_name.upper() }}▼</a>
                             </li>
                         {% endfor %}
                     </ul>
-
-                    <br>
 
                     <div class="tab-content" id="formats-tabContent">
                         {% for form_name, form in forms.items() %}
@@ -93,14 +84,10 @@
                                     {{ form.csrf_token }}
                                     {{ form.format }}
 
-                                    <h4>
-                                        Files
-                                    </h4>
-
                                     <table>
                                         {% for upload_method in form.upload_methods %}
                                             <tr>
-                                                <th style="width: 180px;">{{ upload_method.label }}</th>
+                                                <th style="width: 180px;"><b>{{ upload_method.label }}: </b></th>
 
                                                 <th>
                                                     <div class="input-group">
@@ -125,7 +112,14 @@
 
                                     {{ form.output_type }}
 
-                                    <input type="submit" value="Process" class="btn btn-primary show-output-btn">
+                                    <br>
+
+                                    <div class="form-group form-check text-center">
+                                        <input type="checkbox" class="form-check-input" id="generate-plots-{{ form_name }}">
+                                        <label class="form-check-label" for="generate-plots-{{ form_name }}">Generate plots</label>
+                                    </div>
+
+                                    <input id="process-btn" type="submit" value="Process" class="btn btn-success show-output-btn">
                                 </form>
 
                             </div>
@@ -139,16 +133,24 @@
             </div>
         </div>
 
-        <div class="row" id="output">
-            <div class="col-lg-12">
-                <h2>Output</h2>
+        <div class="modal fade" id="results-modal" tabindex="-1" role="dialog" aria-labelledby="results-modal"
+             aria-hidden="true" style="padding-left: 15px">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="row" id="output">
+                        <div class="col-lg-12">
+                            <h2>Output</h2>
 
-                <div id="output-result">
+                            <div id="output-result">
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                 </div>
-
             </div>
-
         </div>
 
         <hr class="clearfix"/>
@@ -177,7 +179,7 @@
 
     <footer class="footer">
         <div class="container text-center">
-            <span class="text-muted">Trajectory - 2019</span>
+            <span class="text-muted">Meteor Trajectory Solver - 2020</span>
         </div>
     </footer>
 {% endblock %}

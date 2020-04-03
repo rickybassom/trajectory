@@ -1,22 +1,23 @@
-<a data-toggle="collapse" href="#options-{{ format }}" role="button" aria-expanded="false"
-   aria-controls="options-{{ format }}"><p>More options ⯆</p></a>
-
-<div class="collapse" id="options-{{ format }}">
-    <div class="card-body">
-        <div class="form-group row">
-            <label for="max-toffset" class="col-3 col-form-label">max_toffset</label>
-            <div class="col-3">{{ form.max_toffset(class_="form-control") }}</div>
-        </div>
-
-        <div class="form-group row">
-            <label for="v_init_part" class="col-3 col-form-label">v_init_part</label>
-            <div class="col-3">{{ form.v_init_part(class_="form-control") }}</div>
-        </div>
-
-        <div class="form-group row">
-            <label for="v_init_ht" class="col-3 col-form-label">v_init_ht</label>
-            <div class="col-3">{{ form.v_init_ht(class_="form-control") }}</div>
-        </div>
-
-    </div>
+<div style="padding: 15px" id="options-{{ format }}">
+    <b>
+        Optional parameters:
+    </b>
+    <br>
+    <table>
+        <tr>
+            <th style="width: 180px; padding: 0"><label for="max-toffset" class="col-form-label">max_toffset</label>
+            </th>
+            <th style="padding: 0">{{ form.max_toffset(class_="form-control") }}</th>
+        </tr>
+        <tr>
+            <th style="width: 180px; padding: 0"><label for="v_init_part" class="col-form-label">v_init_part</label>
+            </th>
+            <th style="padding: 0">{{ form.v_init_part(class_="form-control") }}</th>
+        </tr>
+        <tr>
+            <th style="width: 180px; padding: 0"><label for="v_init_ht" class="col-form-label">v_init_ht</label></th>
+            <th style="padding: 0">{{ form.v_init_ht(class_="form-control") }}</th>
+        </tr>
+    </table>
+    <small>(v_init_ht = -1.00 = None)</small>
 </div>

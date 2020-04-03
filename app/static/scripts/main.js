@@ -16,11 +16,13 @@ function onFormJSONSubmit(event, form) {
     // Stop the browser from submitting the form.
     event.preventDefault();
 
+    $('#results-modal').modal('show');
+
     var formData = new FormData(form);
 
     $.ajaxSetup({
         beforeSend: function (xhr, settings) {
-            outputResultDiv.innerHTML = "Loading......";
+            outputResultDiv.innerHTML = '<div class="loader"></div>';
 
             if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
                 xhr.setRequestHeader("X-CSRFToken", CSRFToken)
@@ -39,6 +41,10 @@ function onFormJSONSubmit(event, form) {
             outputResultDiv.innerHTML = "";
             console.log(response);
             setServerReturnedFiles(response);
+            var formName = form.format.value.toLowerCase();
+            if (document.getElementById("generate-plots-" + formName).checked) {
+                document.getElementById("load-plots-btn").click();
+            }
 
         },
         error: function (error) {
@@ -52,31 +58,45 @@ function onFormJSONSubmit(event, form) {
 }
 
 function setServerReturnedFiles(json_data) {
-    console.log(json_data);
-
     var id = json_data.id;
 
-    var h5 = document.createElement("h5");
-    h5.innerText = "Files - " + id;
+    var h5 = document.createElement("small");
+    h5.innerText = "ID - " + id;
     outputResultDiv.appendChild(h5);
 
+    var currentDate = new Date();
+    var tenMinutesLater = new Date(currentDate.getTime() + (10 * 60 * 1000));
+    executeAt(tenMinutesLater, function () {
+        alert("Files have been removed");
+    });
+
+    var deletionTime = document.createElement("small");
+    deletionTime.style.display = "block";
+    deletionTime.innerText = "Files will be removed at: " + tenMinutesLater.toString();
+    outputResultDiv.appendChild(deletionTime);
+
     for (i in json_data.files) {
+        var container = document.createElement("div");
+
         var link = document.createElement("a");
         link.href = json_data.files[i];
+        link.innerHTML = '<i class="fas fa-file"></i> ' + json_data.files[i].replace(/^.*[\\\/]/, '');
+        link.setAttribute("data-toggle", "tooltip");
+        link.setAttribute("title", "Download");
 
-        var p = document.createElement("p");
-        var filename = json_data.files[i].replace(/^.*[\\\/]/, '');
-        p.innerText = filename;
-
-        link.appendChild(p);
-        outputResultDiv.appendChild(link);
+        container.appendChild(link);
+        outputResultDiv.appendChild(container);
     }
 
     var btn = document.createElement("button");
+    btn.id = "load-plots-btn";
+    btn.classList.add("btn");
+    btn.classList.add("btn-primary");
     btn.addEventListener("click", function () {
         $.ajaxSetup({
             beforeSend: function (xhr, settings) {
-                plotBox.innerHTML = "Loading......";
+                btn.style.display = "none";
+                plotBox.innerHTML = '<br><div class="loader"></div>';
             }
         });
 
@@ -86,13 +106,16 @@ function setServerReturnedFiles(json_data) {
             success: function (response) {
                 plotBox.innerHTML = "";
                 setServerReturnedPlots(response);
+
             },
             error: function (error) {
+                btn.style.display = "block";
                 plotBox.innerHTML = "";
                 setServerReturnedError(error, plotBox);
             }
         });
     });
+
     btn.innerText = "Plot trajectories";
     outputResultDiv.appendChild(btn);
 
@@ -103,8 +126,14 @@ function setServerReturnedFiles(json_data) {
 function setServerReturnedPlots(plots) {
     plots = JSON.parse(plots);
     var count = 0;
-    for(plot in plots){
+    for (plot in plots) {
+        plotBox.appendChild(document.createElement("hr"));
+
         var value = plots[plot];
+        title = document.createElement("p");
+        title.innerText = plot;
+        plotBox.appendChild(title);
+
         figure = document.createElement("div");
         figure.id = "fig" + count.toString();
         plotBox.appendChild(figure);
@@ -117,10 +146,19 @@ function setServerReturnedError(error, box) {
     console.log(error);
 
     var p = document.createElement("p");
-    p.innerText = "Error: " + JSON.stringify(error.responseJSON);
+    p.innerHTML = "Error: " + error.statusText + "<br>" + error.responseText;
     box.appendChild(p);
 }
 
+function executeAt(time, func) {
+    var currentTime = new Date().getTime();
+    if (currentTime > time) {
+        console.error("Time is in the Past");
+        return false;
+    }
+    setTimeout(func, time - currentTime);
+    return true;
+}
 
 // add filenames chosen from file choose dialog
 $('.custom-file-input').on('change', function () {
