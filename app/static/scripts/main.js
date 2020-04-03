@@ -136,6 +136,7 @@ function setServerReturnedPlots(plots) {
 
         figure = document.createElement("div");
         figure.id = "fig" + count.toString();
+        figure.style.overflowX = "auto";
         plotBox.appendChild(figure);
         mpld3.draw_figure(figure.id, value);
         count = count + 1;
