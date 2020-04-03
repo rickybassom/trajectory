@@ -67,7 +67,7 @@ function setServerReturnedFiles(json_data) {
     var currentDate = new Date();
     var tenMinutesLater = new Date(currentDate.getTime() + (10 * 60 * 1000));
     executeAt(tenMinutesLater, function () {
-        alert("Files have been removed");
+        alert("Files " + id + "  have been removed");
     });
 
     var deletionTime = document.createElement("small");

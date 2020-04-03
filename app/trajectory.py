@@ -52,6 +52,8 @@ app.config['SECRET_KEY'] = SECRET_KEY
 
 solver = WMPGTrajectoryFormSolver(app.config.get('TEMP_DIR'))
 
+temp_lock = []
+
 
 @app.before_first_request
 def init():
@@ -86,6 +88,12 @@ def trajectory_api():
 
             def remove_trajectory_files(solved_path):
                 time.sleep(10 * 60)
+
+                # wait until files are not been used
+                uuid = solved_path[:request_url.rfind('/')]
+                while uuid in temp_lock:
+                    time.sleep(1)
+
                 solver.remove_saved_files(solved_path)
 
             thread = Thread(target=remove_trajectory_files, kwargs={'solved_path': solved_path})
@@ -117,7 +125,9 @@ def load_temp_data(uuid, filename):
 
 @app.route('/trajectory/temp-get-plots/<uuid>', methods=['GET'])
 def get_temp_plots(uuid):
-    # implement lock
+    # enter files lock while
+    temp_lock.append(uuid)
+
     file_path = os.path.join(app.config.get('TEMP_DIR'), uuid)
 
     if not is_safe_path(app.config.get('TEMP_DIR'), file_path):
@@ -128,7 +138,9 @@ def get_temp_plots(uuid):
         traj = loadPickle(file_path, pickle_filename)
     except:
         return abort(404)
+
     # end lock
+    temp_lock.remove(uuid)
 
     frag_pickle_dict = traj.savePlots(None, None, show_plots=False, ret_figs=True)
     frag_pickle_dict_json = {}
