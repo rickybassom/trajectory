@@ -1,9 +1,12 @@
 # trajectory
 [![Build Status](https://travis-ci.com/rickybas/trajectory.svg?token=1Qmp7ACzet4TDsEVzALn&branch=master)](https://travis-ci.com/rickybas/trajectory)
 
-https://globalmeteornetwork.org/trajectory/
+Meteor Trajectory Solver - Web Interface. Supported formats: MILIG, CAMS or RMSJSON 
 
 Using [WesternMeteorPyLib](https://github.com/wmpg/WesternMeteorPyLib)
+
+## Example output
+![Screen](example_output.gif)
 
 ## Building and running
 
