@@ -1,5 +1,5 @@
 # trajectory
-[![Build Status](https://travis-ci.com/rickybas/trajectory.svg?token=1Qmp7ACzet4TDsEVzALn&branch=master)](https://travis-ci.com/rickybas/trajectory)
+[![Build Status](https://travis-ci.com/rickybassom/trajectory.svg?token=1Qmp7ACzet4TDsEVzALn&branch=master)](https://travis-ci.com/rickybassom/trajectory)
 
 Meteor Trajectory Solver - Web Interface. Supported formats: MILIG, CAMS or RMSJSON 
 
