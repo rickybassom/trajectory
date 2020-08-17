@@ -36,6 +36,8 @@ from upload_forms import MILIGUploadForm, CAMSUploadForm, RMSJSONUploadForm
 from wmpg_trajectory_form_solver import WMPGTrajectoryFormSolver
 
 from wmpl.Utils.Pickling import loadPickle
+import matplotlib.pyplot as plt
+
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -53,7 +55,7 @@ app.config['SECRET_KEY'] = SECRET_KEY
 solver = WMPGTrajectoryFormSolver(app.config.get('TEMP_DIR'))
 
 temp_lock = []
-
+plt_clearing_lock = False
 
 @app.before_first_request
 def init():
@@ -156,10 +158,18 @@ def get_temp_plots(uuid):
 
         frag_pickle_dict_json[name] = mpld3.fig_to_dict(fig)
 
-    x = json.dumps(frag_pickle_dict_json, cls=NumpyEncoder)
-    x = x.replace(', "visible": false', "")  # fixes https://github.com/mpld3/mpld3/issues/370
-    x = x.replace(', "visible": true', "")
-    return x
+        # Refresh figure
+        global plt_clearing_lock
+        while plt_clearing_lock: pass
+        plt_clearing_lock = True
+        plt.clf()
+        plt.close()
+        plt_clearing_lock = False
+
+    frag_pickle_dict_json_fixed = json.dumps(frag_pickle_dict_json, cls=NumpyEncoder)
+    frag_pickle_dict_json_fixed = frag_pickle_dict_json_fixed.replace(', "visible": false', "")  # fixes https://github.com/mpld3/mpld3/issues/370
+    frag_pickle_dict_json_fixed = frag_pickle_dict_json_fixed.replace(', "visible": true', "")
+    return frag_pickle_dict_json_fixed
 
 
 # https://security.openstack.org/guidelines/dg_using-file-paths.html
