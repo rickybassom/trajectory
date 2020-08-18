@@ -11,9 +11,7 @@ $(document).ready(function () {
 });
 
 function onFormJSONSubmit(event, form) {
-    console.log('submit clicked');
-
-    // Stop the browser from submitting the form.
+    // Stop the browser from submitting the form
     event.preventDefault();
 
     $('#results-modal').modal('show');

@@ -22,8 +22,7 @@ from mpld3 import _display
 
 _display.NumpyEncoder = NumpyEncoder
 
-import os, time
-import pickle
+import os, time, pickle
 from threading import Thread
 
 from flask import Flask, request, jsonify
@@ -32,11 +31,11 @@ from flask_bootstrap import Bootstrap
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-from upload_forms import MILIGUploadForm, CAMSUploadForm, RMSJSONUploadForm
-from wmpg_trajectory_form_solver import WMPGTrajectoryFormSolver
-
 from wmpl.Utils.Pickling import loadPickle
 import matplotlib.pyplot as plt
+
+from upload_forms import MILIGUploadForm, CAMSUploadForm, RMSJSONUploadForm
+from wmpg_trajectory_form_solver import WMPGTrajectoryFormSolver
 
 
 app = Flask(__name__)
@@ -56,6 +55,7 @@ solver = WMPGTrajectoryFormSolver(app.config.get('TEMP_DIR'))
 
 temp_lock = []
 plt_clearing_lock = False
+
 
 @app.before_first_request
 def init():
@@ -154,7 +154,8 @@ def get_temp_plots(uuid):
             mpld3.plugins.clear(fig)  # disable zooming, moving ... due to double axis mpld3 problem
 
         if name == "orbit":
-            pass
+            plt.axis([-0.3, 0.3, -0.3, 0.3]) # zoom in
+            fig.axes[0].view_init(elev=90, azim=90)  # top down view
 
         frag_pickle_dict_json[name] = mpld3.fig_to_dict(fig)
 
@@ -167,7 +168,8 @@ def get_temp_plots(uuid):
         plt_clearing_lock = False
 
     frag_pickle_dict_json_fixed = json.dumps(frag_pickle_dict_json, cls=NumpyEncoder)
-    frag_pickle_dict_json_fixed = frag_pickle_dict_json_fixed.replace(', "visible": false', "")  # fixes https://github.com/mpld3/mpld3/issues/370
+    frag_pickle_dict_json_fixed = frag_pickle_dict_json_fixed.replace(', "visible": false',
+                                                                      "")  # fixes https://github.com/mpld3/mpld3/issues/370
     frag_pickle_dict_json_fixed = frag_pickle_dict_json_fixed.replace(', "visible": true', "")
     return frag_pickle_dict_json_fixed
 
