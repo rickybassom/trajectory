@@ -92,14 +92,14 @@ function setServerReturnedFiles(json_data) {
     btn.classList.add("btn-primary");
     btn.addEventListener("click", function () {
         $.ajaxSetup({
-            beforeSend: function (xhr, settings) {
+            beforeSend: function () {
                 btn.style.display = "none";
                 plotBox.innerHTML = '<br><div class="loader"></div>';
             }
         });
 
         $.ajax({
-            url: "/trajectory/temp-get-plots/" + id,
+            url: "/trajectory/get-temp-plots/" + id,
             type: "GET",
             success: function (response) {
                 plotBox.innerHTML = "";

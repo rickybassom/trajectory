@@ -20,8 +20,11 @@ class WMPGTrajectoryFormSolver:
         """
         Return JSON of output directory including zip
 
-        :param form:
-        :return:
+        :param form: (UploadForm) the form object submitted by the user
+        :param format: (str) supported input data format (MILIG, CAMS and RMSJSON currently)
+        :param url_base: (str) url base e.g. 0.0.0.0:80
+        :raises Exception: if form received cannot be solved
+        :return: (tuple) solved data full path, json of the data id and files urls
         """
 
         try:
@@ -33,10 +36,10 @@ class WMPGTrajectoryFormSolver:
 
         json_files = []
         for file in os.listdir(uuid_path):
-            json_files.append(url_base + os.path.join("/temp", uuid, file))
+            json_files.append(url_base + os.path.join("/get-temp-file", uuid, file))
 
         zip_file = self._create_zip(uuid_path)
-        json_files.append(url_base + os.path.join("/temp", uuid, zip_file))
+        json_files.append(url_base + os.path.join("/get-temp-file", uuid, zip_file))
 
         data = {}
         data["id"] = uuid
@@ -46,11 +49,10 @@ class WMPGTrajectoryFormSolver:
 
     def _create_zip(self, output_dir):
         """
-        Return filename of zip of output_dir
+        Return filename of output_dir zip
 
-        :param form:
-        :param format:
-        :return:
+        :param output_dir: (string) desired location of zip
+        :return: (str) filename of created zip
         """
 
         timestr = time.strftime("%Y%m%d-%H%M%S")
@@ -76,8 +78,9 @@ class WMPGTrajectoryFormSolver:
         """
         Run wmpg trajectory solver and return the directory path of the output files
 
-        :param form:
-        :return:
+        :param form: (UploadForm) the form object submitted by the user
+        :param format: (str) supported input data format (MILIG, CAMS and RMSJSON currently)
+        :return: (str) directory of output
         """
 
         dir_path = os.path.join(self.temp_dir, uuid.uuid4().hex)
@@ -152,10 +155,9 @@ class WMPGTrajectoryFormSolver:
         """
         Returns saved filenames of files entered in the form
 
-        :param files_data:
-        :param extensions:
-        :param dir_path:
-        :return:
+        :param upload_methods: ([UploadForm]) currently available forms of inputting data
+        :param dir_path: (str) path to save files
+        :return: (dict) saved file names
         """
 
         saved_file_names = dict()  # type of file (e.g FTPdetectinfo) : filename
@@ -191,8 +193,9 @@ class WMPGTrajectoryFormSolver:
 
     def remove_saved_files(self, uuid_directory):
         """
+        Removes directory of outputted trajectory data
 
-        :return:
+        :param uuid_directory: (str) directory of outputted files to remove
         """
         print("removing", uuid_directory)
         shutil.rmtree(uuid_directory)

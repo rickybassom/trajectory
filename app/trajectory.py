@@ -1,29 +1,10 @@
-import mpld3, json, numpy
+import os, time, pickle, mpld3, json, numpy
 
-
-# FIX: https://github.com/mpld3/mpld3/issues/434
-class NumpyEncoder(json.JSONEncoder):
-    """ Special json encoder for numpy types """
-
-    def default(self, obj):
-        if isinstance(obj, (numpy.int_, numpy.intc, numpy.intp, numpy.int8,
-                            numpy.int16, numpy.int32, numpy.int64, numpy.uint8,
-                            numpy.uint16, numpy.uint32, numpy.uint64)):
-            return int(obj)
-        elif isinstance(obj, (numpy.float_, numpy.float16, numpy.float32,
-                              numpy.float64)):
-            return float(obj)
-        elif isinstance(obj, (numpy.ndarray,)):  #### This is the fix
-            return obj.tolist()
-        return json.JSONEncoder.default(self, obj)
-
-
-from mpld3 import _display
-
-_display.NumpyEncoder = NumpyEncoder
-
-import os, time, pickle
 from threading import Thread
+from mpld3 import _display
+import matplotlib.pyplot as plt
+
+from wmpl.Utils.Pickling import loadPickle
 
 from flask import Flask, request, jsonify
 from flask import render_template, abort, send_file
@@ -31,12 +12,8 @@ from flask_bootstrap import Bootstrap
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-from wmpl.Utils.Pickling import loadPickle
-import matplotlib.pyplot as plt
-
 from upload_forms import MILIGUploadForm, CAMSUploadForm, RMSJSONUploadForm
 from wmpg_trajectory_form_solver import WMPGTrajectoryFormSolver
-
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -113,8 +90,8 @@ def trajectory_api():
     return response
 
 
-@app.route('/trajectory/temp/<uuid>/<filename>', methods=['GET'])
-def load_temp_data(uuid, filename):
+@app.route('/trajectory/get-temp-file/<uuid>/<filename>', methods=['GET'])
+def get_temp_file(uuid, filename):
     file_path = os.path.join(app.config.get('TEMP_DIR'), uuid, filename)
 
     if not is_safe_path(app.config.get('TEMP_DIR'), str(file_path)):
@@ -125,7 +102,7 @@ def load_temp_data(uuid, filename):
         return abort(404)
 
 
-@app.route('/trajectory/temp-get-plots/<uuid>', methods=['GET'])
+@app.route('/trajectory/get-temp-plots/<uuid>', methods=['GET'])
 def get_temp_plots(uuid):
     # enter files lock while
     temp_lock.append(uuid)
@@ -154,7 +131,7 @@ def get_temp_plots(uuid):
             mpld3.plugins.clear(fig)  # disable zooming, moving ... due to double axis mpld3 problem
 
         if name == "orbit":
-            plt.axis([-0.3, 0.3, -0.3, 0.3]) # zoom in
+            plt.axis([-0.3, 0.3, -0.3, 0.3])  # zoom in
             fig.axes[0].view_init(elev=90, azim=90)  # top down view
 
         frag_pickle_dict_json[name] = mpld3.fig_to_dict(fig)
@@ -181,3 +158,23 @@ def is_safe_path(basedir, path, follow_symlinks=True):
         return os.path.realpath(path).startswith(basedir)
 
     return os.path.abspath(path).startswith(basedir)
+
+
+# FIX: https://github.com/mpld3/mpld3/issues/434
+class NumpyEncoder(json.JSONEncoder):
+    """ Special json encoder for numpy types """
+
+    def default(self, obj):
+        if isinstance(obj, (numpy.int_, numpy.intc, numpy.intp, numpy.int8,
+                            numpy.int16, numpy.int32, numpy.int64, numpy.uint8,
+                            numpy.uint16, numpy.uint32, numpy.uint64)):
+            return int(obj)
+        elif isinstance(obj, (numpy.float_, numpy.float16, numpy.float32,
+                              numpy.float64)):
+            return float(obj)
+        elif isinstance(obj, (numpy.ndarray,)):  #### This is the fix
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
+
+_display.NumpyEncoder = NumpyEncoder
