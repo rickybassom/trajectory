@@ -15,4 +15,4 @@ if __name__ == "__main__":
                 print("removing", file)
 
     atexit.register(app_atexit)
-    app.run(port=80, host='0.0.0.0', ssl_context='adhoc', threaded=True, debug=True)
+    app.run(port=80, host='0.0.0.0', ssl_context='adhoc', threaded=True, debug=False)
