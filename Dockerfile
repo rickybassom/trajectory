@@ -6,13 +6,15 @@ RUN apt-get update
 RUN apt-get install -y --no-install-recommends \
     gcc gfortran python3-dev libffi-dev libssl-dev build-essential wget libfreetype6-dev libpng-dev libopenblas-dev libgeos-dev \
     python-qt4 python3-numpy python3-scipy python3-pandas cython python3-matplotlib python3-statsmodels python3-ephem libgl1-mesa-glx
+# RUN apt-get install -y nginx uwsgi-core uwsgi-src uuid-dev uwsgi-plugin-python  # Un-comment for deployment
 
 RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
-
 ENV PYTHONPATH "${PYTHONPATH}:/usr/lib/python3.7/site-packages"
 
-# Add to cache
 ADD app/requirements.txt /app/requirements.txt
+ADD start.sh /app/start.sh
+ADD uwsgi.ini /app/uwsgi.ini
+ADD build_python37_uwsgi.sh /app/build_python37_uwsgi.sh 
 
 # numpy needs to be installed before other packages
 RUN pip install --upgrade pip
@@ -29,8 +31,13 @@ WORKDIR /app
 
 EXPOSE 80
 
-#ENV PYTHONPATH "${PYTHONPATH}:/app/WesternMeteorPyLib/"
-
 RUN cd WesternMeteorPyLib/ && python3 setup.py install
 
-CMD ["python", "wsgi.py"]
+CMD ["python", "wsgi.py"]  # Comment for deployment
+
+# Un-comment below for deployment
+# COPY nginx.conf /etc/nginx
+# RUN chmod +x ./start.sh
+# RUN chmod +x ./build_python37_uwsgi.sh 
+# RUN ./build_python37_uwsgi.sh 
+# CMD ["./start.sh"]
