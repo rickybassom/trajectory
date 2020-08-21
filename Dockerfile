@@ -11,17 +11,16 @@ RUN apt-get install -y --no-install-recommends \
 RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
 ENV PYTHONPATH "${PYTHONPATH}:/usr/lib/python3.7/site-packages"
 
-ADD app/requirements.txt /app/requirements.txt
-ADD start.sh /app/start.sh
-ADD uwsgi.ini /app/uwsgi.ini
-ADD build_python37_uwsgi.sh /app/build_python37_uwsgi.sh 
+# ADD app/requirements.txt /app/requirements.txt
+# ADD start.sh /app/start.sh
+# ADD uwsgi.ini /app/uwsgi.ini 
 
 # numpy needs to be installed before other packages
-RUN pip install --upgrade pip
-RUN pip install --upgrade numpy
-RUN pip install --upgrade -r /app/requirements.txt
-RUN pip install --upgrade pyproj==1.9.6
-RUN pip install --upgrade https://github.com/matplotlib/basemap/archive/master.zip
+RUN pip install --upgrade pip --src /usr/local/src
+RUN pip install --upgrade numpy --src /usr/local/src
+RUN pip install --upgrade -r /app/requirements.txt --src /usr/local/src
+RUN pip install --upgrade pyproj==1.9.6 --src /usr/local/src
+RUN pip install --upgrade https://github.com/matplotlib/basemap/archive/master.zip --src /usr/local/src
 
 # Cache
 ADD app /app
@@ -36,8 +35,5 @@ RUN cd WesternMeteorPyLib/ && python3 setup.py install
 CMD ["python", "wsgi.py"]  # Comment for deployment
 
 # Un-comment below for deployment
-# COPY nginx.conf /etc/nginx
-# RUN chmod +x ./start.sh
-# RUN chmod +x ./build_python37_uwsgi.sh 
-# RUN ./build_python37_uwsgi.sh 
+# COPY nginx.conf /etc/nginx 
 # CMD ["./start.sh"]
