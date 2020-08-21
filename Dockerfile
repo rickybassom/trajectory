@@ -11,16 +11,16 @@ RUN apt-get install -y --no-install-recommends \
 RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
 ENV PYTHONPATH "${PYTHONPATH}:/usr/lib/python3.7/site-packages"
 
-# ADD app/requirements.txt /app/requirements.txt
-# ADD start.sh /app/start.sh
-# ADD uwsgi.ini /app/uwsgi.ini 
+ADD app/requirements.txt /app/requirements.txt
+ADD start.sh /app/start.sh
+ADD uwsgi.ini /app/uwsgi.ini 
 
 # numpy needs to be installed before other packages
-RUN pip install --upgrade pip --src /usr/local/src
-RUN pip install --upgrade numpy --src /usr/local/src
-RUN pip install --upgrade -r /app/requirements.txt --src /usr/local/src
-RUN pip install --upgrade pyproj==1.9.6 --src /usr/local/src
-RUN pip install --upgrade https://github.com/matplotlib/basemap/archive/master.zip --src /usr/local/src
+RUN pip install --upgrade pip 
+RUN pip install --upgrade numpy
+RUN pip install --upgrade -r /app/requirements.txt
+RUN pip install --upgrade pyproj==1.9.6
+RUN pip install --upgrade https://github.com/matplotlib/basemap/archive/master.zip
 
 # Cache
 ADD app /app
